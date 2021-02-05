@@ -1,36 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="893a0dc2-791c-4470-89e4-8f79d00421f5" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.dockerignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/mcm-api.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LICENSE" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/root.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/docs.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/swagger.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/swagger.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/api.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/user_router.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/migrations/20210204170830_user.down.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/migrations/20210204170830_user.up.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/document/.gitkeep" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/logger/.gitkeep" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/media/.gitkeep" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/notification/.gitkeep" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/user/requests/user_create_request.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/user/responses/user_response.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/user/user_entity.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/user/user_repository.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/user/user_service.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/create-migration.sh" afterDir="false" />
+    <list default="true" id="893a0dc2-791c-4470-89e4-8f79d00421f5" name="Default Changelist" comment="initial">
+      <change afterPath="$PROJECT_DIR$/internal/core/provider.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/injector.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/router/document_router.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/router/provider.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/server.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/wire_gen.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/document/provider.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/user/provider.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/air.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/.env.example" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/root.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/root.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/docs.go" beforeDir="false" afterPath="$PROJECT_DIR$/docs/docs.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/swagger.json" beforeDir="false" afterPath="$PROJECT_DIR$/docs/swagger.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/swagger.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docs/swagger.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/api.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/inject.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/provider/provider.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/user_router.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/router/user_router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/document/document_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/document/document_repository.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/document/document_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/document/document_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/document/inject.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/document/wire_gen.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/user/inject.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/user/responses/user_response.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/user/responses/user_response.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/user/user_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/user/user_repository.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/user/user_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/user/user_service.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,12 +77,17 @@
       <recent name="$PROJECT_DIR$/pkg/logger" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/internal/router" />
       <recent name="$PROJECT_DIR$/pkg" />
     </key>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="initial" />
+    <option name="LAST_COMMIT_MESSAGE" value="initial" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>

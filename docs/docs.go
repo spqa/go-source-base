@@ -23,7 +23,51 @@ var doc = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {}
+    "paths": {
+        "/accounts/{id}": {
+            "get": {
+                "description": "get string by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Show a account",
+                "operationId": "get-string-by-int",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Account ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.UserResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "responses.UserResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        }
+    }
 }`
 
 type swaggerInfo struct {

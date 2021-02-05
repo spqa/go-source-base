@@ -12,6 +12,7 @@ type Config struct {
 	DatabaseUsername string `mapstructure:"database_username"`
 	DatabasePassword string `mapstructure:"database_password"`
 	DatabaseName     string `mapstructure:"database_name"`
+	WebAppUrl        string `mapstructure:"web_app_url"`
 }
 
 func (config *Config) GetDatabaseDsn() string {
@@ -21,5 +22,15 @@ func (config *Config) GetDatabaseDsn() string {
 		config.DatabasePassword,
 		config.DatabaseName,
 		config.DatabasePort,
+	)
+}
+
+func (config *Config) GetDatabaseUrl() string {
+	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		config.DatabaseUsername,
+		config.DatabasePassword,
+		config.DatabaseHost,
+		config.DatabasePort,
+		config.DatabaseName,
 	)
 }

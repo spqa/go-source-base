@@ -1,4 +1,32 @@
+definitions:
+  responses.UserResponse:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
 info:
   contact: {}
-paths: {}
+paths:
+  /accounts/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get string by ID
+      operationId: get-string-by-int
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.UserResponse'
+      summary: Show a account
 swagger: "2.0"
