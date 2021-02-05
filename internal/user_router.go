@@ -1,11 +1,24 @@
 package internal
 
-import "github.com/labstack/echo/v4"
+import (
+	"github.com/labstack/echo/v4"
+	"mcm-api/pkg/user"
+)
 
-func RegisterUserRouter(group *echo.Group) {
-	group.GET("", index)
+type UserRouter struct {
+	service *user.Service
 }
 
-func index(echo.Context) error {
+func NewUserRouter(service *user.Service) *UserRouter {
+	return &UserRouter{
+		service: service,
+	}
+}
+
+func (router *UserRouter) Register(group *echo.Group) {
+	group.GET("", router.index)
+}
+
+func (router *UserRouter) index(echo.Context) error {
 	return nil
 }

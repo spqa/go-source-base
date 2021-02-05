@@ -1,10 +1,10 @@
-package user
+package document
 
 type Service struct {
 	repository *repository
 }
 
-func initializeService(repository *repository) *Service {
+func NewService(repository *repository) *Service {
 	return &Service{
 		repository: repository,
 	}

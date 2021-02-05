@@ -11,8 +11,7 @@ import "github.com/swaggo/echo-swagger"
 // @termsOfService http://swagger.io/terms/
 
 // @contact.name API Support
-// @contact.url http://www.swagger.io/support
-// @contact.email support@swagger.io
+// @contact.email superquanganh@gmail.com
 
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
@@ -22,6 +21,6 @@ import "github.com/swaggo/echo-swagger"
 func NewApi() {
 	e := echo.New()
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
-	RegisterUserRouter(e.Group("user"))
+	CreateUserRouter().Register(e.Group("user"))
 	e.Logger.Fatal(e.Start(":3000"))
 }
