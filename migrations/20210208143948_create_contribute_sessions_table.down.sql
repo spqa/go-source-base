@@ -1,0 +1,1 @@
+drop table contribute_sessions;
