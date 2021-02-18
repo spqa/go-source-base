@@ -11,3 +11,7 @@ func InitializeRepository(db *gorm.DB) *repository {
 		db: db,
 	}
 }
+
+func (r repository) find() {
+
+}
