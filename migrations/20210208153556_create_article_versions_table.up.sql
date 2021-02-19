@@ -1,7 +1,7 @@
 create table article_versions
 (
     id            serial primary key,
-    hash text not null,
+    hash          text        not null,
     article_id    bigint references articles (id),
     link_original text        not null,
     link_pdf      text,
