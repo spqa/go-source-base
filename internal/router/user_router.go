@@ -2,7 +2,10 @@ package router
 
 import (
 	"github.com/labstack/echo/v4"
+	"mcm-api/pkg/response"
 	"mcm-api/pkg/user"
+	"net/http"
+	"strconv"
 )
 
 type UserRouter struct {
@@ -17,6 +20,7 @@ func NewUserRouter(service *user.Service) *UserRouter {
 
 func (router *UserRouter) Register(group *echo.Group) {
 	group.GET("", router.index)
+	group.GET("/:id", router.getById)
 }
 
 // @Summary Show a account
@@ -29,4 +33,16 @@ func (router *UserRouter) Register(group *echo.Group) {
 // @Router /accounts/{id} [get]
 func (router *UserRouter) index(echo.Context) error {
 	return nil
+}
+
+func (router *UserRouter) getById(context echo.Context) error {
+	id, err := strconv.Atoi(context.Param("id"))
+	if err != nil {
+		return response.NewApiBadRequestError("Id should be string", nil)
+	}
+	res, err := router.service.FindById(id)
+	if err != nil {
+		return err
+	}
+	return context.JSON(http.StatusOK, res)
 }

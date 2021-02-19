@@ -10,6 +10,7 @@ import (
 	_ "mcm-api/docs"
 	"mcm-api/internal/router"
 	"mcm-api/pkg/log"
+	"mcm-api/pkg/response"
 	"os"
 	"os/signal"
 	"time"
@@ -29,6 +30,7 @@ func newServer(
 ) *Server {
 	e := echo.New()
 	e.HideBanner = true
+	e.HTTPErrorHandler = errorHandler
 	return &Server{
 		config:         config,
 		echo:           e,
@@ -52,8 +54,8 @@ func newServer(
 // @BasePath /v2
 func (s Server) registerRouter() {
 	s.echo.GET("/swagger/*", echoSwagger.WrapHandler)
-	s.userRouter.Register(s.echo.Group("user"))
-	s.documentRouter.Register(s.echo.Group("document"))
+	s.userRouter.Register(s.echo.Group("users"))
+	s.documentRouter.Register(s.echo.Group("documents"))
 }
 
 func (s Server) registerMiddleware() {
@@ -64,6 +66,20 @@ func (s Server) registerMiddleware() {
 			s.config.WebAppUrl,
 		},
 	}))
+}
+
+func errorHandler(err error, c echo.Context) {
+	if !c.Response().Committed {
+		switch e := err.(type) {
+		case *response.ApiError:
+			_ = c.JSON(e.StatusCode, e)
+			break
+		default:
+			log.Logger.Error("unhandled error")
+			internalError := response.NewApiInternalError(nil)
+			_ = c.JSON(internalError.StatusCode, internalError)
+		}
+	}
 }
 
 func (s *Server) Start() {
