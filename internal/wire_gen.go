@@ -7,7 +7,6 @@ package internal
 
 import (
 	"mcm-api/internal/core"
-	"mcm-api/internal/router"
 	"mcm-api/pkg/document"
 	"mcm-api/pkg/user"
 )
@@ -23,10 +22,10 @@ func InitializeServer() *Server {
 	db := core.ProvideDB(config)
 	repository := user.InitializeRepository(db)
 	service := user.InitializeService(repository)
-	userRouter := router.NewUserRouter(service)
+	userHandler := user.NewUserHandler(service)
 	documentRepository := document.InitializeRepository(db)
 	documentService := document.InitializeService(documentRepository)
-	documentRouter := router.NewDocumentRouter(documentService)
-	server := newServer(config, userRouter, documentRouter)
+	documentHandler := document.NewDocumentHandler(documentService)
+	server := newServer(config, userHandler, documentHandler)
 	return server
 }

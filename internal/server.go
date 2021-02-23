@@ -8,34 +8,41 @@ import (
 	"go.uber.org/zap"
 	"mcm-api/config"
 	_ "mcm-api/docs"
-	"mcm-api/internal/router"
+	"mcm-api/pkg/document"
 	"mcm-api/pkg/log"
-	"mcm-api/pkg/response"
+	"mcm-api/pkg/user"
 	"os"
 	"os/signal"
 	"time"
 )
 
 type Server struct {
-	config         *config.Config
-	echo           *echo.Echo
-	userRouter     *router.UserRouter
-	documentRouter *router.DocumentRouter
+	config          *config.Config
+	echo            *echo.Echo
+	userHandler     *user.Handler
+	documentHandler *document.Handler
 }
 
 func newServer(
 	config *config.Config,
-	userRouter *router.UserRouter,
-	documentRouter *router.DocumentRouter,
+	userRouter *user.Handler,
+	documentRouter *document.Handler,
 ) *Server {
 	e := echo.New()
 	e.HideBanner = true
-	e.HTTPErrorHandler = errorHandler
+	e.Use(middleware.Recover())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{
+			"http://localhost:4200",
+			"https://localhost:4200",
+			config.WebAppUrl,
+		},
+	}))
 	return &Server{
-		config:         config,
-		echo:           e,
-		userRouter:     userRouter,
-		documentRouter: documentRouter,
+		config:          config,
+		echo:            e,
+		userHandler:     userRouter,
+		documentHandler: documentRouter,
 	}
 }
 
@@ -52,38 +59,14 @@ func newServer(
 
 // @host petstore.swagger.io
 // @BasePath /v2
-func (s Server) registerRouter() {
+func (s Server) registerHandler() {
 	s.echo.GET("/swagger/*", echoSwagger.WrapHandler)
-	s.userRouter.Register(s.echo.Group("users"))
-	s.documentRouter.Register(s.echo.Group("documents"))
-}
-
-func (s Server) registerMiddleware() {
-	s.echo.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{
-			"http://localhost:4200",
-			"https://localhost:4200",
-			s.config.WebAppUrl,
-		},
-	}))
-}
-
-func errorHandler(err error, c echo.Context) {
-	if !c.Response().Committed {
-		switch e := err.(type) {
-		case *response.ApiError:
-			_ = c.JSON(e.StatusCode, e)
-			break
-		default:
-			log.Logger.Error("unhandled error")
-			internalError := response.NewApiInternalError(nil)
-			_ = c.JSON(internalError.StatusCode, internalError)
-		}
-	}
+	s.userHandler.Register(s.echo.Group("users"))
+	s.documentHandler.Register(s.echo.Group("documents"))
 }
 
 func (s *Server) Start() {
-	s.registerRouter()
+	s.registerHandler()
 	go func() {
 		if err := s.echo.Start(":3000"); err != nil {
 			log.Logger.Info("shutting down the server")

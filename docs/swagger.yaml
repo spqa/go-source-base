@@ -35,26 +35,4 @@ paths:
           schema:
             $ref: '#/definitions/responses.UserResponse'
       summary: Show a account
-  /users:
-    get:
-      description: Get user list
-      parameters:
-      - description: Limit
-        in: query
-        name: limit
-        type: integer
-      - description: Offset
-        in: query
-        name: offset
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/responses.UserResponse'
-      summary: Get user list
-      tags:
-      - User
 swagger: "2.0"

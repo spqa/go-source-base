@@ -1,9 +1,11 @@
 module mcm-api
 
-go 1.15
+go 1.16
 
 require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
+	github.com/casbin/casbin/v2 v2.23.4
+	github.com/casbin/gorm-adapter/v3 v3.2.0
 	github.com/go-redis/redis/v8 v8.5.0
 	github.com/golang-migrate/migrate/v4 v4.14.1
 	github.com/google/wire v0.5.0

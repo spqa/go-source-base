@@ -1,6 +1,9 @@
 package user
 
-import "gorm.io/gorm"
+import (
+	"context"
+	"gorm.io/gorm"
+)
 
 type repository struct {
 	db *gorm.DB
@@ -12,8 +15,8 @@ func InitializeRepository(db *gorm.DB) *repository {
 	}
 }
 
-func (r repository) FindById(id int) (*Entity, error) {
+func (r repository) FindById(ctx context.Context, id int) (*Entity, error) {
 	var result Entity
-	db := r.db.First(&result, id)
+	db := r.db.WithContext(ctx).First(&result, id)
 	return &result, db.Error
 }
