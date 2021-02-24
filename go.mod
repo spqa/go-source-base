@@ -6,6 +6,8 @@ require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/casbin/casbin/v2 v2.23.4
 	github.com/casbin/gorm-adapter/v3 v3.2.0
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/go-redis/redis/v8 v8.5.0
 	github.com/golang-migrate/migrate/v4 v4.14.1
 	github.com/google/wire v0.5.0
@@ -15,6 +17,7 @@ require (
 	github.com/swaggo/echo-swagger v1.1.0
 	github.com/swaggo/swag v1.7.0
 	go.uber.org/zap v1.10.0
+	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 	gorm.io/driver/postgres v1.0.8
 	gorm.io/gorm v1.20.12
 )

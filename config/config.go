@@ -13,6 +13,9 @@ type Config struct {
 	DatabasePassword string `mapstructure:"database_password"`
 	DatabaseName     string `mapstructure:"database_name"`
 	WebAppUrl        string `mapstructure:"web_app_url"`
+	JwtSecret        string `mapstructure:"jwt_secret"`
+	AdminEmail       string `mapstructure:"admin_email"`
+	AdminPassword    string `mapstructure:"admin_password"`
 }
 
 func (config *Config) GetDatabaseDsn() string {

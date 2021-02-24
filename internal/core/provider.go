@@ -15,6 +15,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"mcm-api/config"
+	"mcm-api/pkg/authz"
 	"mcm-api/pkg/document"
 	"mcm-api/pkg/log"
 	"mcm-api/pkg/user"
@@ -73,4 +74,4 @@ func ProvideEnforcer(db *gorm.DB) *casbin.Enforcer {
 }
 
 var InfraSet = wire.NewSet(ProvideConfig, ProvideDB, ProvideRedis, ProvideEnforcer)
-var HandlerSet = wire.NewSet(document.NewDocumentHandler, user.NewUserHandler)
+var HandlerSet = wire.NewSet(document.NewDocumentHandler, user.NewUserHandler, authz.NewAuthHandler)

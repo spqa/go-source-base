@@ -1,19 +1,18 @@
 package user
 
-type Role int
-
-const (
-	Administrator        Role = 1
-	MarketingManager     Role = 2
-	MarketingCoordinator Role = 3
-	Student              Role = 4
-	Guest                Role = 5
+import (
+	"mcm-api/pkg/common"
+	"time"
 )
 
 type Entity struct {
-	Id   int
-	Name string
-	Role Role
+	Id        int
+	Name      string
+	Email     string
+	Password  string
+	Role      common.Role
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 func (e *Entity) TableName() string {

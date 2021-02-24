@@ -1,7 +1,9 @@
 definitions:
-  responses.UserResponse:
+  user.UserResponse:
     properties:
       createdAt:
+        type: string
+      email:
         type: string
       id:
         type: integer
@@ -33,6 +35,6 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/responses.UserResponse'
+            $ref: '#/definitions/user.UserResponse'
       summary: Show a account
 swagger: "2.0"

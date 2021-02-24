@@ -10,4 +10,4 @@ start-dev:
 
 build-air:
 	swag init
-	go build -o ./tmp/main .
+	DEBUG=true go build -o ./tmp/main .

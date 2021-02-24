@@ -28,7 +28,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responses.UserResponse"
+                            "$ref": "#/definitions/user.UserResponse"
                         }
                     }
                 }
@@ -36,10 +36,13 @@
         }
     },
     "definitions": {
-        "responses.UserResponse": {
+        "user.UserResponse": {
             "type": "object",
             "properties": {
                 "createdAt": {
+                    "type": "string"
+                },
+                "email": {
                     "type": "string"
                 },
                 "id": {

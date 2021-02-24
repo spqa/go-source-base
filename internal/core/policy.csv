@@ -1,0 +1,4 @@
+p, admin, /*, *
+p, marketing_manager, /, *
+p, member, /logout, *
+p, member, /member/*, *

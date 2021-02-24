@@ -7,7 +7,9 @@ package internal
 
 import (
 	"mcm-api/internal/core"
+	"mcm-api/pkg/authz"
 	"mcm-api/pkg/document"
+	"mcm-api/pkg/startup"
 	"mcm-api/pkg/user"
 )
 
@@ -21,11 +23,15 @@ func InitializeServer() *Server {
 	config := core.ProvideConfig()
 	db := core.ProvideDB(config)
 	repository := user.InitializeRepository(db)
-	service := user.InitializeService(repository)
-	userHandler := user.NewUserHandler(service)
+	enforcer := core.ProvideEnforcer(db)
+	service := user.InitializeService(config, repository, enforcer)
+	startupService := startup.InitializeStartUpService(service)
+	authzService := authz.InitializeAuthService(config, service)
+	handler := authz.NewAuthHandler(authzService)
+	userHandler := user.NewUserHandler(config, service)
 	documentRepository := document.InitializeRepository(db)
 	documentService := document.InitializeService(documentRepository)
 	documentHandler := document.NewDocumentHandler(documentService)
-	server := newServer(config, userHandler, documentHandler)
+	server := newServer(config, startupService, handler, userHandler, documentHandler)
 	return server
 }

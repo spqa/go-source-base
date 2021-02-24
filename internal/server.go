@@ -8,8 +8,10 @@ import (
 	"go.uber.org/zap"
 	"mcm-api/config"
 	_ "mcm-api/docs"
+	"mcm-api/pkg/authz"
 	"mcm-api/pkg/document"
 	"mcm-api/pkg/log"
+	"mcm-api/pkg/startup"
 	"mcm-api/pkg/user"
 	"os"
 	"os/signal"
@@ -19,14 +21,18 @@ import (
 type Server struct {
 	config          *config.Config
 	echo            *echo.Echo
+	startupService  *startup.Service
+	authHandler     *authz.Handler
 	userHandler     *user.Handler
 	documentHandler *document.Handler
 }
 
 func newServer(
 	config *config.Config,
-	userRouter *user.Handler,
-	documentRouter *document.Handler,
+	startupService *startup.Service,
+	authHandler *authz.Handler,
+	userHandler *user.Handler,
+	documentHandler *document.Handler,
 ) *Server {
 	e := echo.New()
 	e.HideBanner = true
@@ -41,8 +47,10 @@ func newServer(
 	return &Server{
 		config:          config,
 		echo:            e,
-		userHandler:     userRouter,
-		documentHandler: documentRouter,
+		startupService:  startupService,
+		authHandler:     authHandler,
+		userHandler:     userHandler,
+		documentHandler: documentHandler,
 	}
 }
 
@@ -61,11 +69,16 @@ func newServer(
 // @BasePath /v2
 func (s Server) registerHandler() {
 	s.echo.GET("/swagger/*", echoSwagger.WrapHandler)
+	s.authHandler.Register(s.echo.Group("auth"))
 	s.userHandler.Register(s.echo.Group("users"))
 	s.documentHandler.Register(s.echo.Group("documents"))
 }
 
 func (s *Server) Start() {
+	err := s.startupService.Run()
+	if err != nil {
+		log.Logger.Panic("Startup service run failed", zap.Error(err))
+	}
 	s.registerHandler()
 	go func() {
 		if err := s.echo.Start(":3000"); err != nil {
