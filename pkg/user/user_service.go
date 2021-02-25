@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/casbin/casbin/v2"
+	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"mcm-api/config"
@@ -75,7 +76,7 @@ func (s *Service) CreateUser(ctx context.Context, loggedInUser *common.LoggedInU
 		Password: string(hashedPassword),
 		Role:     req.Role,
 	}
-	err = s.repository.CreateUser(ctx, entity)
+	err = s.repository.Create(ctx, entity)
 	if err != nil {
 		return nil, err
 	}
@@ -91,16 +92,34 @@ func (s *Service) CreateDefaultAdmin(ctx context.Context) error {
 		log.Logger.Info("skip create default admin")
 		return nil
 	}
+	log.Logger.Info("init admin account", zap.String("email", s.cfg.AdminEmail))
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(s.cfg.AdminPassword), 10)
 	if err != nil {
 		return err
 	}
-	return s.repository.CreateUser(ctx, &Entity{
+	return s.repository.Create(ctx, &Entity{
 		Name:     "Administrators",
 		Email:    s.cfg.AdminEmail,
 		Password: string(hashedPassword),
 		Role:     common.Administrator,
 	})
+}
+
+func (s *Service) Find(ctx context.Context, user *common.LoggedInUser, query *UserIndexQuery) (*common.PaginateResponse, error) {
+	entities, count, err := s.repository.FindAndCount(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	dtos := mapEntitiesToResponse(entities)
+	return common.NewPaginateResponse(dtos, count, query.Page, query.GetLimit()), nil
+}
+
+func mapEntitiesToResponse(entity []*Entity) []*UserResponse {
+	var result []*UserResponse
+	for i := range entity {
+		result = append(result, mapEntityToResponse(entity[i]))
+	}
+	return result
 }
 
 func mapEntityToResponse(entity *Entity) *UserResponse {

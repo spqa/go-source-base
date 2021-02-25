@@ -7,7 +7,7 @@ import (
 )
 
 type UserIndexQuery struct {
-	Role common.Role `query:"role"`
+	Role common.Role `query:"role" enums:"admin,marketing_manager,marketing_coordinator,student,guest"`
 	common.PaginateQuery
 }
 

@@ -27,7 +27,21 @@ func (r *repository) FindByEmail(ctx context.Context, email string) (*Entity, er
 	return &result, db.Error
 }
 
-func (r *repository) CreateUser(ctx context.Context, entity *Entity) error {
+func (r *repository) Create(ctx context.Context, entity *Entity) error {
 	save := r.db.WithContext(ctx).Create(entity)
 	return save.Error
+}
+
+func (r *repository) FindAndCount(ctx context.Context, query *UserIndexQuery) ([]*Entity, int64, error) {
+	db := r.db.WithContext(ctx).Table("users")
+	if query.Role != "" {
+		db.Where("role = ?", query.Role)
+	}
+	var count int64
+	db.Count(&count)
+	db.Limit(query.GetLimit())
+	db.Offset(query.GetOffSet())
+	var entities []*Entity
+	result := db.Find(&entities)
+	return entities, count, result.Error
 }

@@ -1,30 +1,30 @@
 package middleware
 
 import (
-	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"go.uber.org/zap"
+	"mcm-api/pkg/apperror"
 	"mcm-api/pkg/common"
+	"mcm-api/pkg/log"
 	"strconv"
 )
 
-//func RequireAuthentication(jwtSecret string) echo.MiddlewareFunc {
-//	jwtMiddleware := middleware.JWT([]byte(jwtSecret))
-//	authMiddleware := requireAuthentication()
-//	return func(next echo.HandlerFunc) echo.HandlerFunc {
-//		return func(c echo.Context) error {
-//			h := next
-//			jwtMiddleware(h)
-//			authMiddleware(h)
-//			return h(c)
-//		}
-//	}
-//}
+func RequireAuthentication(jwtSecret string) echo.MiddlewareFunc {
+	return Compose(middleware.JWTWithConfig(middleware.JWTConfig{
+		SigningKey: []byte(jwtSecret),
+		ErrorHandlerWithContext: func(err error, context echo.Context) error {
+			log.Logger.Debug("JWT error", zap.Error(err))
+			appError := apperror.New(apperror.ErrUnauthorized, "invalid token", nil)
+			return apperror.HandleError(appError, context)
+		},
+	}), requireAuthentication())
+}
 
-func RequireAuthentication() echo.MiddlewareFunc {
+func requireAuthentication() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			fmt.Println("haha")
 			u := c.Get("user").(*jwt.Token)
 			claims := u.Claims.(jwt.MapClaims)
 			id, _ := strconv.Atoi(claims["sub"].(string))
@@ -35,6 +35,18 @@ func RequireAuthentication() echo.MiddlewareFunc {
 				Role:  common.Role(claims["role"].(string)),
 			})
 			return next(c)
+		}
+	}
+}
+
+func Compose(middlewares ...echo.MiddlewareFunc) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			h := next
+			for i := len(middlewares) - 1; i >= 0; i-- {
+				h = middlewares[i](h)
+			}
+			return h(c)
 		}
 	}
 }

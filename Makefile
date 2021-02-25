@@ -9,5 +9,5 @@ start-dev:
 	air -c ./scripts/air.toml
 
 build-air:
-	swag init
-	DEBUG=true go build -o ./tmp/main .
+	swag init -g internal/server.go
+	go1.16 build -o ./tmp/main .

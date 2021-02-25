@@ -7,6 +7,7 @@ import (
 	"mcm-api/internal/core"
 	"mcm-api/pkg/authz"
 	"mcm-api/pkg/document"
+	"mcm-api/pkg/faculty"
 	"mcm-api/pkg/startup"
 	"mcm-api/pkg/user"
 )
@@ -18,6 +19,7 @@ func InitializeServer() *Server {
 		document.Set,
 		authz.Set,
 		startup.Set,
+		faculty.Set,
 		core.HandlerSet,
 		newServer,
 	))

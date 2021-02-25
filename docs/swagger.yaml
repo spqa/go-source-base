@@ -1,4 +1,54 @@
 definitions:
+  authz.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  authz.LoginResponse:
+    properties:
+      accessToken:
+        type: string
+      createdAt:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      role:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  common.PaginateResponse:
+    properties:
+      currentPage:
+        type: integer
+      data:
+        type: object
+      lastPage:
+        type: integer
+      perPage:
+        type: integer
+      total:
+        type: integer
+    type: object
+  user.UserCreateReq:
+    properties:
+      email:
+        type: string
+      facultyId:
+        type: integer
+      name:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
+    type: object
   user.UserResponse:
     properties:
       createdAt:
@@ -17,14 +67,116 @@ definitions:
 info:
   contact: {}
 paths:
-  /accounts/{id}:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login
+      parameters:
+      - description: login req
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/authz.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/authz.LoginResponse'
+      summary: Login
+      tags:
+      - Auth
+  /users:
     get:
       consumes:
       - application/json
-      description: get string by ID
-      operationId: get-string-by-int
+      description: list users
       parameters:
-      - description: Account ID
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
+      - enum:
+        - admin
+        - marketing_manager
+        - marketing_coordinator
+        - student
+        - guest
+        in: query
+        name: role
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.PaginateResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/user.UserResponse'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: list users
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/json
+      description: Create a user
+      parameters:
+      - description: create user
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.UserCreateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.UserResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a user
+      tags:
+      - Users
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a user
+      tags:
+      - Users
+    get:
+      consumes:
+      - application/json
+      description: get user by ID
+      parameters:
+      - description: User ID
         in: path
         name: id
         required: true
@@ -36,5 +188,42 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/user.UserResponse'
-      summary: Show a account
+      security:
+      - ApiKeyAuth: []
+      summary: Show a user
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Create a user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: create user
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.UserCreateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.UserResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a user
+      tags:
+      - Users
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

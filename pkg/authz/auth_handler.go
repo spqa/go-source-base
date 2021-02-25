@@ -20,6 +20,14 @@ func (h *Handler) Register(group *echo.Group) {
 	group.POST("/login", h.login)
 }
 
+// @Tags Auth
+// @Summary Login
+// @Description Login
+// @Accept  json
+// @Produce  json
+// @Param body body authz.LoginRequest true "login req"
+// @Success 200 {object} authz.LoginResponse
+// @Router /auth/login [post]
 func (h Handler) login(ctx echo.Context) error {
 	req := new(LoginRequest)
 	err := ctx.Bind(&req)

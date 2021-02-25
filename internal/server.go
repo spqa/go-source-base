@@ -7,9 +7,10 @@ import (
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"go.uber.org/zap"
 	"mcm-api/config"
-	_ "mcm-api/docs"
+	"mcm-api/docs"
 	"mcm-api/pkg/authz"
 	"mcm-api/pkg/document"
+	"mcm-api/pkg/faculty"
 	"mcm-api/pkg/log"
 	"mcm-api/pkg/startup"
 	"mcm-api/pkg/user"
@@ -25,6 +26,7 @@ type Server struct {
 	authHandler     *authz.Handler
 	userHandler     *user.Handler
 	documentHandler *document.Handler
+	faculty         *faculty.Handler
 }
 
 func newServer(
@@ -33,6 +35,7 @@ func newServer(
 	authHandler *authz.Handler,
 	userHandler *user.Handler,
 	documentHandler *document.Handler,
+	facultyHandler *faculty.Handler,
 ) *Server {
 	e := echo.New()
 	e.HideBanner = true
@@ -51,27 +54,25 @@ func newServer(
 		authHandler:     authHandler,
 		userHandler:     userHandler,
 		documentHandler: documentHandler,
+		faculty:         facultyHandler,
 	}
 }
 
-// @title Swagger Example API
-// @version 1.0
-// @description This is a sample server Petstore server.
-// @termsOfService http://swagger.io/terms/
-
-// @contact.name API Support
-// @contact.email superquanganh@gmail.com
-
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host petstore.swagger.io
-// @BasePath /v2
-func (s Server) registerHandler() {
-	s.echo.GET("/swagger/*", echoSwagger.WrapHandler)
+func (s *Server) registerHandler() {
 	s.authHandler.Register(s.echo.Group("auth"))
 	s.userHandler.Register(s.echo.Group("users"))
 	s.documentHandler.Register(s.echo.Group("documents"))
+	s.faculty.Register(s.echo.Group("faculties"))
+}
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+func (s *Server) Swagger() {
+	docs.SwaggerInfo.Title = "Magazine Collaboration API"
+	docs.SwaggerInfo.Description = "Magazine Collaboration API documentation"
+	docs.SwaggerInfo.Version = "1.0"
+	s.echo.GET("/swagger/*", echoSwagger.WrapHandler)
 }
 
 func (s *Server) Start() {
@@ -79,9 +80,11 @@ func (s *Server) Start() {
 	if err != nil {
 		log.Logger.Panic("Startup service run failed", zap.Error(err))
 	}
+	s.Swagger()
 	s.registerHandler()
 	go func() {
 		if err := s.echo.Start(":3000"); err != nil {
+			log.Logger.Error("server error", zap.Error(err))
 			log.Logger.Info("shutting down the server")
 		}
 	}()
@@ -94,4 +97,5 @@ func (s *Server) Start() {
 	if err := s.echo.Shutdown(ctx); err != nil {
 		log.Logger.Fatal("Error shutting down server", zap.Error(err))
 	}
+	log.Logger.Info("Bye!")
 }

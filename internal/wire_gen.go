@@ -9,12 +9,9 @@ import (
 	"mcm-api/internal/core"
 	"mcm-api/pkg/authz"
 	"mcm-api/pkg/document"
+	"mcm-api/pkg/faculty"
 	"mcm-api/pkg/startup"
 	"mcm-api/pkg/user"
-)
-
-import (
-	_ "mcm-api/docs"
 )
 
 // Injectors from injector.go:
@@ -32,6 +29,9 @@ func InitializeServer() *Server {
 	documentRepository := document.InitializeRepository(db)
 	documentService := document.InitializeService(documentRepository)
 	documentHandler := document.NewDocumentHandler(documentService)
-	server := newServer(config, startupService, handler, userHandler, documentHandler)
+	facultyRepository := faculty.InitializeRepository(db)
+	facultyService := faculty.InitializeService(config, facultyRepository, enforcer)
+	facultyHandler := faculty.NewHandler(config, facultyService)
+	server := newServer(config, startupService, handler, userHandler, documentHandler, facultyHandler)
 	return server
 }
