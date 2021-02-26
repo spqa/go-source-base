@@ -32,8 +32,8 @@ func (h *Handler) Register(group *echo.Group) {
 }
 
 // @Tags Users
-// @Summary list users
-// @Description list users
+// @Summary List users
+// @Description List users
 // @Accept  json
 // @Produce  json
 // @Param params query user.UserIndexQuery false "user index query"
@@ -101,8 +101,8 @@ func (h Handler) createUser(ctx echo.Context) error {
 }
 
 // @Tags Users
-// @Summary Create a user
-// @Description Create a user
+// @Summary Update a user
+// @Description Update a user
 // @Accept  json
 // @Produce  json
 // @Param id path int true "User ID"

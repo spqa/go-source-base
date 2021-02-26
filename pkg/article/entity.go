@@ -1,4 +1,4 @@
-package contribution
+package article
 
 import (
 	"gorm.io/datatypes"

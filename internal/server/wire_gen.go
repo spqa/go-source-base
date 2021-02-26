@@ -3,7 +3,7 @@
 //go:generate go run github.com/google/wire/cmd/wire
 //+build !wireinject
 
-package internal
+package server
 
 import (
 	"mcm-api/internal/core"

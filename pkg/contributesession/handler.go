@@ -1,4 +1,4 @@
-package faculty
+package contributesession
 
 import (
 	"github.com/labstack/echo/v4"
@@ -26,19 +26,20 @@ func (h *Handler) Register(group *echo.Group) {
 	group.GET("", h.index)
 	group.GET("/:id", h.getById)
 	group.POST("", h.create)
+	group.POST(":id/export", h.create)
 	group.PUT(":id", h.update)
 	group.DELETE(":id", h.delete)
 }
 
-// @Tags Faculties
-// @Summary List faculties
-// @Description List faculties
+// @Tags Contribute Sessions
+// @Summary List Contribute Sessions
+// @Description List Contribute Sessions
 // @Accept  json
 // @Produce  json
-// @Param params query faculty.IndexQuery false "index query"
-// @Success 200 {object} common.PaginateResponse{data=faculty.FacultyResponse}
+// @Param params query contributesession.IndexQuery false "index query"
+// @Success 200 {object} common.PaginateResponse{data=contributesession.SessionRes}
 // @Security ApiKeyAuth
-// @Router /faculties [get]
+// @Router /contribute-sessions [get]
 func (h *Handler) index(context echo.Context) error {
 	query := new(IndexQuery)
 	err := context.Bind(query)
@@ -52,15 +53,15 @@ func (h *Handler) index(context echo.Context) error {
 	return context.JSON(http.StatusOK, paginateResponse)
 }
 
-// @Tags Faculties
-// @Summary Show a faculty
-// @Description get faculty by ID
+// @Tags Contribute Sessions
+// @Summary Show a Contribute Session
+// @Description get Contribute Session by ID
 // @Accept  json
 // @Produce  json
 // @Param id path int true "ID"
-// @Success 200 {object} faculty.FacultyResponse
+// @Success 200 {object} contributesession.SessionRes
 // @Security ApiKeyAuth
-// @Router /faculties/{id} [get]
+// @Router /contribute-sessions/{id} [get]
 func (h *Handler) getById(context echo.Context) error {
 	id, err := strconv.Atoi(context.Get("id").(string))
 	if err != nil {
@@ -73,17 +74,17 @@ func (h *Handler) getById(context echo.Context) error {
 	return context.JSON(http.StatusOK, result)
 }
 
-// @Tags Faculties
-// @Summary Create a faculty
-// @Description Create a faculty
+// @Tags Contribute Sessions
+// @Summary Create a Contribute Session
+// @Description Create a Contribute Session
 // @Accept  json
 // @Produce  json
-// @Param body body faculty.FacultyCreateReq true "create"
-// @Success 200 {object} faculty.FacultyResponse
+// @Param body body contributesession.SessionCreateReq true "create"
+// @Success 200 {object} contributesession.SessionRes
 // @Security ApiKeyAuth
-// @Router /faculties [post]
+// @Router /contribute-sessions [post]
 func (h *Handler) create(context echo.Context) error {
-	body := new(FacultyCreateReq)
+	body := new(SessionCreateReq)
 	err := context.Bind(body)
 	if err != nil {
 		return apperror.HandleError(err, context)
@@ -95,22 +96,22 @@ func (h *Handler) create(context echo.Context) error {
 	return context.JSON(http.StatusOK, result)
 }
 
-// @Tags Faculties
-// @Summary Update a faculty
-// @Description Update a faculty
+// @Tags Contribute Sessions
+// @Summary Update a Contribute Session
+// @Description Update a Contribute Session
 // @Accept  json
 // @Produce  json
 // @Param id path int true "ID"
-// @Param body body faculty.FacultyUpdateReq true "create"
-// @Success 200 {object} faculty.FacultyResponse
+// @Param body body contributesession.SessionUpdateReq true "create"
+// @Success 200 {object} contributesession.SessionRes
 // @Security ApiKeyAuth
-// @Router /faculties/{id} [put]
+// @Router /contribute-sessions/{id} [put]
 func (h *Handler) update(context echo.Context) error {
 	id, err := strconv.Atoi(context.Get("id").(string))
 	if err != nil {
 		return apperror.HandleError(err, context)
 	}
-	body := new(FacultyUpdateReq)
+	body := new(SessionUpdateReq)
 	err = context.Bind(body)
 	if err != nil {
 		return apperror.HandleError(err, context)
@@ -122,15 +123,15 @@ func (h *Handler) update(context echo.Context) error {
 	return context.JSON(http.StatusOK, result)
 }
 
-// @Tags Faculties
-// @Summary Delete a faculty
-// @Description Delete a faculty
+// @Tags Contribute Sessions
+// @Summary Delete a Contribute Session
+// @Description Delete a Contribute Session
 // @Accept  json
 // @Produce  json
 // @Param id path int true "ID"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /faculties/{id} [delete]
+// @Router /contribute-sessions/{id} [delete]
 func (h *Handler) delete(context echo.Context) error {
 	id, err := strconv.Atoi(context.Get("id").(string))
 	if err != nil {

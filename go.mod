@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
+	github.com/aws/aws-sdk-go v1.37.19 // indirect
 	github.com/casbin/casbin/v2 v2.23.4
 	github.com/casbin/gorm-adapter/v3 v3.2.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -18,6 +19,7 @@ require (
 	github.com/swaggo/swag v1.7.0
 	go.uber.org/zap v1.10.0
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
+	gorm.io/datatypes v1.0.0
 	gorm.io/driver/postgres v1.0.8
 	gorm.io/gorm v1.20.12
 )

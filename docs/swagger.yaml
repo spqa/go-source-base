@@ -1,4 +1,32 @@
 definitions:
+  article.ArticleRes:
+    properties:
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+      updatedAt:
+        type: string
+      versions:
+        items:
+          $ref: '#/definitions/article.ArticleVersionRes'
+        type: array
+    type: object
+  article.ArticleVersionRes:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      linkOriginal:
+        type: string
+      linkPdf:
+        type: string
+    type: object
   authz.LoginRequest:
     properties:
       email:
@@ -23,6 +51,31 @@ definitions:
       updatedAt:
         type: string
     type: object
+  comment.CommentCreateReq:
+    properties:
+      content:
+        type: string
+      contributionId:
+        type: integer
+    type: object
+  comment.CommentRes:
+    properties:
+      content:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      updatedAt:
+        type: string
+      user:
+        $ref: '#/definitions/user.UserResponse'
+    type: object
+  comment.CommentUpdateReq:
+    properties:
+      content:
+        type: string
+    type: object
   common.PaginateResponse:
     properties:
       currentPage:
@@ -35,6 +88,104 @@ definitions:
         type: integer
       total:
         type: integer
+    type: object
+  contributesession.SessionCreateReq:
+    properties:
+      closureTime:
+        type: string
+      finalClosureTIme:
+        type: string
+      openTime:
+        type: string
+    type: object
+  contributesession.SessionRes:
+    properties:
+      closureTime:
+        type: string
+      createdAt:
+        type: string
+      exportedAssets:
+        type: string
+      finalClosureTIme:
+        type: string
+      id:
+        type: integer
+      openTime:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  contributesession.SessionUpdateReq:
+    properties:
+      closureTime:
+        type: string
+      finalClosureTIme:
+        type: string
+      openTime:
+        type: string
+    type: object
+  contribution.ArticleReq:
+    properties:
+      description:
+        type: string
+      link:
+        type: string
+      title:
+        type: string
+    type: object
+  contribution.ContributionCreateReq:
+    properties:
+      article:
+        $ref: '#/definitions/contribution.ArticleReq'
+      images:
+        items:
+          type: string
+        type: array
+    type: object
+  contribution.ContributionRes:
+    properties:
+      articleId:
+        type: integer
+      contributeSessionId:
+        type: integer
+      createdAt:
+        type: string
+      id:
+        type: integer
+      images:
+        items:
+          type: string
+        type: array
+      status:
+        type: string
+      updatedAt:
+        type: string
+      user:
+        $ref: '#/definitions/user.UserResponse'
+    type: object
+  contribution.ContributionUpdateReq:
+    properties:
+      article:
+        $ref: '#/definitions/contribution.ArticleReq'
+      images:
+        items:
+          type: string
+        type: array
+    type: object
+  faculty.FacultyCreateReq:
+    type: object
+  faculty.FacultyResponse:
+    type: object
+  faculty.FacultyUpdateReq:
+    type: object
+  systemdata.DataRes:
+    additionalProperties:
+      type: string
+    type: object
+  systemdata.DataUpdateReq:
+    properties:
+      value:
+        type: string
     type: object
   user.UserCreateReq:
     properties:
@@ -67,6 +218,29 @@ definitions:
 info:
   contact: {}
 paths:
+  /articles/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get article by ID
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/article.ArticleRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Show a article
+      tags:
+      - Articles
   /auth/login:
     post:
       consumes:
@@ -89,11 +263,551 @@ paths:
       summary: Login
       tags:
       - Auth
+  /comments:
+    get:
+      consumes:
+      - application/json
+      description: List comments
+      parameters:
+      - in: query
+        name: contributionId
+        required: true
+        type: integer
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.PaginateResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/comment.CommentRes'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: List comments
+      tags:
+      - Comments
+    post:
+      consumes:
+      - application/json
+      description: Create a comment
+      parameters:
+      - description: create
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/comment.CommentCreateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/comment.CommentRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a comment
+      tags:
+      - Comments
+  /comments/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a comment
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a comment
+      tags:
+      - Comments
+    get:
+      consumes:
+      - application/json
+      description: get comment by ID
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/comment.CommentRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Show a comment
+      tags:
+      - Comments
+    put:
+      consumes:
+      - application/json
+      description: Update a comment
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/comment.CommentUpdateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/comment.CommentRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update a comment
+      tags:
+      - Comments
+  /contribute-sessions:
+    get:
+      consumes:
+      - application/json
+      description: List Contribute Sessions
+      parameters:
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.PaginateResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/contributesession.SessionRes'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: List Contribute Sessions
+      tags:
+      - Contribute Sessions
+    post:
+      consumes:
+      - application/json
+      description: Create a Contribute Session
+      parameters:
+      - description: create
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/contributesession.SessionCreateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/contributesession.SessionRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a Contribute Session
+      tags:
+      - Contribute Sessions
+  /contribute-sessions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a Contribute Session
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a Contribute Session
+      tags:
+      - Contribute Sessions
+    get:
+      consumes:
+      - application/json
+      description: get Contribute Session by ID
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/contributesession.SessionRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Show a Contribute Session
+      tags:
+      - Contribute Sessions
+    put:
+      consumes:
+      - application/json
+      description: Update a Contribute Session
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: create
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/contributesession.SessionUpdateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/contributesession.SessionRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update a Contribute Session
+      tags:
+      - Contribute Sessions
+  /contributions:
+    get:
+      consumes:
+      - application/json
+      description: List contributions
+      parameters:
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.PaginateResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/contribution.ContributionRes'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: List contributions
+      tags:
+      - Contributions
+    post:
+      consumes:
+      - application/json
+      description: Create a contribution
+      parameters:
+      - description: create
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/contribution.ContributionCreateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/contribution.ContributionRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a contribution
+      tags:
+      - Contributions
+  /contributions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a contribution
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a contribution
+      tags:
+      - Contributions
+    get:
+      consumes:
+      - application/json
+      description: get contribution by ID
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/contribution.ContributionRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Show a contribution
+      tags:
+      - Contributions
+    put:
+      consumes:
+      - application/json
+      description: Update a contribution
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: create
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/contribution.ContributionUpdateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/contribution.ContributionRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update a contribution
+      tags:
+      - Contributions
+  /faculties:
+    get:
+      consumes:
+      - application/json
+      description: List faculties
+      parameters:
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.PaginateResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/faculty.FacultyResponse'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: List faculties
+      tags:
+      - Faculties
+    post:
+      consumes:
+      - application/json
+      description: Create a faculty
+      parameters:
+      - description: create
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/faculty.FacultyCreateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/faculty.FacultyResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a faculty
+      tags:
+      - Faculties
+  /faculties/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a faculty
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a faculty
+      tags:
+      - Faculties
+    get:
+      consumes:
+      - application/json
+      description: get faculty by ID
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/faculty.FacultyResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Show a faculty
+      tags:
+      - Faculties
+    put:
+      consumes:
+      - application/json
+      description: Update a faculty
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: create
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/faculty.FacultyUpdateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/faculty.FacultyResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update a faculty
+      tags:
+      - Faculties
+  /system-data:
+    get:
+      consumes:
+      - application/json
+      description: Get System Data
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/systemdata.DataRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get System Data
+      tags:
+      - System Data
+  /system-data/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update system data
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: create
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/systemdata.DataUpdateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update system data
+      tags:
+      - System Data
   /users:
     get:
       consumes:
       - application/json
-      description: list users
+      description: List users
       parameters:
       - in: query
         name: limit
@@ -124,7 +838,7 @@ paths:
               type: object
       security:
       - ApiKeyAuth: []
-      summary: list users
+      summary: List users
       tags:
       - Users
     post:
@@ -196,7 +910,7 @@ paths:
     put:
       consumes:
       - application/json
-      description: Create a user
+      description: Update a user
       parameters:
       - description: User ID
         in: path
@@ -218,7 +932,7 @@ paths:
             $ref: '#/definitions/user.UserResponse'
       security:
       - ApiKeyAuth: []
-      summary: Create a user
+      summary: Update a user
       tags:
       - Users
 securityDefinitions:

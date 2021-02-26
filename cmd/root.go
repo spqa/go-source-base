@@ -18,7 +18,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"mcm-api/internal"
+	server2 "mcm-api/internal/server"
 	"os"
 
 	"github.com/spf13/viper"
@@ -39,7 +39,7 @@ to quickly create a Cobra application.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
-		server := internal.InitializeServer()
+		server := server2.InitializeServer()
 		server.Start()
 	},
 }

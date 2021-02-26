@@ -1,4 +1,4 @@
-package faculty
+package contribution
 
 import (
 	"github.com/labstack/echo/v4"
@@ -30,15 +30,15 @@ func (h *Handler) Register(group *echo.Group) {
 	group.DELETE(":id", h.delete)
 }
 
-// @Tags Faculties
-// @Summary List faculties
-// @Description List faculties
+// @Tags Contributions
+// @Summary List contributions
+// @Description List contributions
 // @Accept  json
 // @Produce  json
-// @Param params query faculty.IndexQuery false "index query"
-// @Success 200 {object} common.PaginateResponse{data=faculty.FacultyResponse}
+// @Param params query contribution.IndexQuery false "index query"
+// @Success 200 {object} common.PaginateResponse{data=contribution.ContributionRes}
 // @Security ApiKeyAuth
-// @Router /faculties [get]
+// @Router /contributions [get]
 func (h *Handler) index(context echo.Context) error {
 	query := new(IndexQuery)
 	err := context.Bind(query)
@@ -52,15 +52,15 @@ func (h *Handler) index(context echo.Context) error {
 	return context.JSON(http.StatusOK, paginateResponse)
 }
 
-// @Tags Faculties
-// @Summary Show a faculty
-// @Description get faculty by ID
+// @Tags Contributions
+// @Summary Show a contribution
+// @Description get contribution by ID
 // @Accept  json
 // @Produce  json
 // @Param id path int true "ID"
-// @Success 200 {object} faculty.FacultyResponse
+// @Success 200 {object} contribution.ContributionRes
 // @Security ApiKeyAuth
-// @Router /faculties/{id} [get]
+// @Router /contributions/{id} [get]
 func (h *Handler) getById(context echo.Context) error {
 	id, err := strconv.Atoi(context.Get("id").(string))
 	if err != nil {
@@ -73,17 +73,17 @@ func (h *Handler) getById(context echo.Context) error {
 	return context.JSON(http.StatusOK, result)
 }
 
-// @Tags Faculties
-// @Summary Create a faculty
-// @Description Create a faculty
+// @Tags Contributions
+// @Summary Create a contribution
+// @Description Create a contribution
 // @Accept  json
 // @Produce  json
-// @Param body body faculty.FacultyCreateReq true "create"
-// @Success 200 {object} faculty.FacultyResponse
+// @Param body body contribution.ContributionCreateReq true "create"
+// @Success 200 {object} contribution.ContributionRes
 // @Security ApiKeyAuth
-// @Router /faculties [post]
+// @Router /contributions [post]
 func (h *Handler) create(context echo.Context) error {
-	body := new(FacultyCreateReq)
+	body := new(ContributionCreateReq)
 	err := context.Bind(body)
 	if err != nil {
 		return apperror.HandleError(err, context)
@@ -95,22 +95,22 @@ func (h *Handler) create(context echo.Context) error {
 	return context.JSON(http.StatusOK, result)
 }
 
-// @Tags Faculties
-// @Summary Update a faculty
-// @Description Update a faculty
+// @Tags Contributions
+// @Summary Update a contribution
+// @Description Update a contribution
 // @Accept  json
 // @Produce  json
 // @Param id path int true "ID"
-// @Param body body faculty.FacultyUpdateReq true "create"
-// @Success 200 {object} faculty.FacultyResponse
+// @Param body body contribution.ContributionUpdateReq true "create"
+// @Success 200 {object} contribution.ContributionRes
 // @Security ApiKeyAuth
-// @Router /faculties/{id} [put]
+// @Router /contributions/{id} [put]
 func (h *Handler) update(context echo.Context) error {
 	id, err := strconv.Atoi(context.Get("id").(string))
 	if err != nil {
 		return apperror.HandleError(err, context)
 	}
-	body := new(FacultyUpdateReq)
+	body := new(ContributionUpdateReq)
 	err = context.Bind(body)
 	if err != nil {
 		return apperror.HandleError(err, context)
@@ -122,15 +122,15 @@ func (h *Handler) update(context echo.Context) error {
 	return context.JSON(http.StatusOK, result)
 }
 
-// @Tags Faculties
-// @Summary Delete a faculty
-// @Description Delete a faculty
+// @Tags Contributions
+// @Summary Delete a contribution
+// @Description Delete a contribution
 // @Accept  json
 // @Produce  json
 // @Param id path int true "ID"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /faculties/{id} [delete]
+// @Router /contributions/{id} [delete]
 func (h *Handler) delete(context echo.Context) error {
 	id, err := strconv.Atoi(context.Get("id").(string))
 	if err != nil {

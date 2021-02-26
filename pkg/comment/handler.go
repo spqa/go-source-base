@@ -1,4 +1,4 @@
-package faculty
+package comment
 
 import (
 	"github.com/labstack/echo/v4"
@@ -30,15 +30,15 @@ func (h *Handler) Register(group *echo.Group) {
 	group.DELETE(":id", h.delete)
 }
 
-// @Tags Faculties
-// @Summary List faculties
-// @Description List faculties
+// @Tags Comments
+// @Summary List comments
+// @Description List comments
 // @Accept  json
 // @Produce  json
-// @Param params query faculty.IndexQuery false "index query"
-// @Success 200 {object} common.PaginateResponse{data=faculty.FacultyResponse}
+// @Param params query comment.IndexQuery false "index query"
+// @Success 200 {object} common.PaginateResponse{data=comment.CommentRes}
 // @Security ApiKeyAuth
-// @Router /faculties [get]
+// @Router /comments [get]
 func (h *Handler) index(context echo.Context) error {
 	query := new(IndexQuery)
 	err := context.Bind(query)
@@ -52,15 +52,15 @@ func (h *Handler) index(context echo.Context) error {
 	return context.JSON(http.StatusOK, paginateResponse)
 }
 
-// @Tags Faculties
-// @Summary Show a faculty
-// @Description get faculty by ID
+// @Tags Comments
+// @Summary Show a comment
+// @Description get comment by ID
 // @Accept  json
 // @Produce  json
 // @Param id path int true "ID"
-// @Success 200 {object} faculty.FacultyResponse
+// @Success 200 {object} comment.CommentRes
 // @Security ApiKeyAuth
-// @Router /faculties/{id} [get]
+// @Router /comments/{id} [get]
 func (h *Handler) getById(context echo.Context) error {
 	id, err := strconv.Atoi(context.Get("id").(string))
 	if err != nil {
@@ -73,17 +73,17 @@ func (h *Handler) getById(context echo.Context) error {
 	return context.JSON(http.StatusOK, result)
 }
 
-// @Tags Faculties
-// @Summary Create a faculty
-// @Description Create a faculty
+// @Tags Comments
+// @Summary Create a comment
+// @Description Create a comment
 // @Accept  json
 // @Produce  json
-// @Param body body faculty.FacultyCreateReq true "create"
-// @Success 200 {object} faculty.FacultyResponse
+// @Param body body comment.CommentCreateReq true "create"
+// @Success 200 {object} comment.CommentRes
 // @Security ApiKeyAuth
-// @Router /faculties [post]
+// @Router /comments [post]
 func (h *Handler) create(context echo.Context) error {
-	body := new(FacultyCreateReq)
+	body := new(CommentCreateReq)
 	err := context.Bind(body)
 	if err != nil {
 		return apperror.HandleError(err, context)
@@ -95,22 +95,22 @@ func (h *Handler) create(context echo.Context) error {
 	return context.JSON(http.StatusOK, result)
 }
 
-// @Tags Faculties
-// @Summary Update a faculty
-// @Description Update a faculty
+// @Tags Comments
+// @Summary Update a comment
+// @Description Update a comment
 // @Accept  json
 // @Produce  json
 // @Param id path int true "ID"
-// @Param body body faculty.FacultyUpdateReq true "create"
-// @Success 200 {object} faculty.FacultyResponse
+// @Param body body comment.CommentUpdateReq true "update"
+// @Success 200 {object} comment.CommentRes
 // @Security ApiKeyAuth
-// @Router /faculties/{id} [put]
+// @Router /comments/{id} [put]
 func (h *Handler) update(context echo.Context) error {
 	id, err := strconv.Atoi(context.Get("id").(string))
 	if err != nil {
 		return apperror.HandleError(err, context)
 	}
-	body := new(FacultyUpdateReq)
+	body := new(CommentUpdateReq)
 	err = context.Bind(body)
 	if err != nil {
 		return apperror.HandleError(err, context)
@@ -122,15 +122,15 @@ func (h *Handler) update(context echo.Context) error {
 	return context.JSON(http.StatusOK, result)
 }
 
-// @Tags Faculties
-// @Summary Delete a faculty
-// @Description Delete a faculty
+// @Tags Comments
+// @Summary Delete a comment
+// @Description Delete a comment
 // @Accept  json
 // @Produce  json
 // @Param id path int true "ID"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /faculties/{id} [delete]
+// @Router /comments/{id} [delete]
 func (h *Handler) delete(context echo.Context) error {
 	id, err := strconv.Atoi(context.Get("id").(string))
 	if err != nil {
