@@ -1,6 +1,7 @@
 package contribution
 
 import (
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"mcm-api/pkg/common"
 	"mcm-api/pkg/user"
 )
@@ -25,12 +26,30 @@ type ArticleReq struct {
 	Link        string `json:"link"`
 }
 
+func (r *ArticleReq) Validate() error {
+	return validation.ValidateStruct(r,
+		validation.Field(&r.Title, validation.Required, validation.Length(10, 255)),
+		validation.Field(&r.Description, validation.Length(15, 512)),
+		validation.Field(&r.Link, validation.Required, validation.Length(10, 255)),
+	)
+}
+
 type ContributionCreateReq struct {
 	Article ArticleReq `json:"article"`
 	Images  []string   `json:"images"`
 }
 
+func (r *ContributionCreateReq) Validate() error {
+	return validation.ValidateStruct(r,
+		validation.Field(&r.Article, validation.Required),
+	)
+}
+
 type ContributionUpdateReq struct {
 	Article ArticleReq `json:"article"`
 	Images  []string   `json:"images"`
+}
+
+func (r *ContributionUpdateReq) Validate() error {
+	return validation.ValidateStruct(r)
 }

@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
-	github.com/aws/aws-sdk-go v1.37.19 // indirect
+	github.com/aws/aws-sdk-go v1.37.19
 	github.com/casbin/casbin/v2 v2.23.4
 	github.com/casbin/gorm-adapter/v3 v3.2.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible

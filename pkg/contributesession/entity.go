@@ -3,7 +3,7 @@ package contributesession
 import "time"
 
 type Entity struct {
-	Id               int
+	Id               int64
 	OpenTime         time.Time
 	ClosureTime      time.Time
 	FinalClosureTime time.Time

@@ -6,6 +6,7 @@ type Config struct {
 	RedisAddr        string `mapstructure:"redis_addr"`
 	RedisPassword    string `mapstructure:"redis_password"`
 	RedisDb          int    `mapstructure:"redis_db"`
+	RedisQueueName   string `mapstructure:"redis_queue_name"`
 	S3MediaBucket    string `mapstructure:"s3_media_bucket"`
 	DatabaseHost     string `mapstructure:"database_host"`
 	DatabasePort     string `mapstructure:"database_port"`
@@ -16,6 +17,7 @@ type Config struct {
 	JwtSecret        string `mapstructure:"jwt_secret"`
 	AdminEmail       string `mapstructure:"admin_email"`
 	AdminPassword    string `mapstructure:"admin_password"`
+	SesSenderEmail   string `mapstructure:"ses_sender_email"`
 }
 
 func (config *Config) GetDatabaseDsn() string {

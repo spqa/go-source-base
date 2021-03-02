@@ -3,6 +3,7 @@ package contributesession
 import (
 	"context"
 	"gorm.io/gorm"
+	"time"
 )
 
 type repository struct {
@@ -15,7 +16,7 @@ func InitializeRepository(db *gorm.DB) *repository {
 	}
 }
 
-func (r repository) FindById(ctx context.Context, id int) (*Entity, error) {
+func (r repository) FindById(ctx context.Context, id int64) (*Entity, error) {
 	result := new(Entity)
 	db := r.db.WithContext(ctx).First(result, id)
 	return result, db.Error
@@ -42,4 +43,16 @@ func (r repository) Update(ctx context.Context, entity *Entity) (*Entity, error)
 
 func (r repository) Delete(ctx context.Context, id int) error {
 	return r.db.WithContext(ctx).Delete(id).Error
+}
+
+func (r repository) FindSessionFromTime(ctx context.Context, time time.Time) (*Entity, error) {
+	var entity Entity
+	db := r.db.WithContext(ctx).Where("open_time < ?", time).
+		Where("final_closure_time > ?", time).
+		First(&entity)
+	return &entity, db.Error
+}
+
+func (r repository) FindAndCount(ctx context.Context, query *IndexQuery) ([]*Entity, int64, error) {
+
 }

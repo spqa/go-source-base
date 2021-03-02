@@ -2,6 +2,7 @@ package worker
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"go.uber.org/zap"
 	"mcm-api/config"
@@ -16,7 +17,7 @@ type worker struct {
 	queue queue.Queue
 }
 
-func InitializeWorker(config *config.Config, queue queue.Queue) *worker {
+func newWorker(config *config.Config, queue queue.Queue) *worker {
 	return &worker{
 		cfg:   config,
 		queue: queue,
@@ -24,14 +25,15 @@ func InitializeWorker(config *config.Config, queue queue.Queue) *worker {
 }
 
 func (w worker) Start() {
+	log.Logger.Info("starting worker")
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	go func() {
 		signalChannel := make(chan os.Signal, 1)
 		signal.Notify(signalChannel, os.Interrupt)
 		s := <-signalChannel
-		log.Logger.Info("Receive signal", zap.String("signal", s.String()))
+		log.Logger.Info("receive signal", zap.String("signal", s.String()))
 		cancelFunc()
-		log.Logger.Info("Grateful shutdown...")
+		log.Logger.Info("grateful shutdown...")
 	}()
 poolQueueLoop:
 	for {
@@ -39,11 +41,19 @@ poolQueueLoop:
 		case <-ctx.Done():
 			break poolQueueLoop
 		default:
-			message, err := w.queue.Pop()
+			message, err := w.queue.Pop(ctx)
 			if err != nil {
-				log.Logger.Error("pop queue error", zap.Error(err))
-				cancelFunc()
+				if !errors.Is(err, context.Canceled) {
+					log.Logger.Error("pop queue error", zap.Error(err))
+				}
+				break poolQueueLoop
 			}
+
+			if message == nil {
+				log.Logger.Debug("receive empty message")
+				continue
+			}
+			log.Logger.Info("receive message", zap.Any("message", message))
 			err = handleMessage(message)
 			if err != nil {
 				log.Logger.Error("process message error", zap.Error(err))
