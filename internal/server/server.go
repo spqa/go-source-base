@@ -12,6 +12,7 @@ import (
 	"mcm-api/pkg/document"
 	"mcm-api/pkg/faculty"
 	"mcm-api/pkg/log"
+	"mcm-api/pkg/media"
 	"mcm-api/pkg/startup"
 	"mcm-api/pkg/user"
 	"os"
@@ -27,6 +28,7 @@ type Server struct {
 	userHandler     *user.Handler
 	documentHandler *document.Handler
 	faculty         *faculty.Handler
+	storage         *media.Handler
 }
 
 func newServer(
@@ -36,6 +38,7 @@ func newServer(
 	userHandler *user.Handler,
 	documentHandler *document.Handler,
 	facultyHandler *faculty.Handler,
+	storage *media.Handler,
 ) *Server {
 	e := echo.New()
 	e.HideBanner = true
@@ -55,6 +58,7 @@ func newServer(
 		userHandler:     userHandler,
 		documentHandler: documentHandler,
 		faculty:         facultyHandler,
+		storage:         storage,
 	}
 }
 
@@ -63,6 +67,7 @@ func (s *Server) registerHandler() {
 	s.userHandler.Register(s.echo.Group("users"))
 	s.documentHandler.Register(s.echo.Group("documents"))
 	s.faculty.Register(s.echo.Group("faculties"))
+	s.storage.Register(s.echo.Group("storage"))
 }
 
 // @securityDefinitions.apikey ApiKeyAuth

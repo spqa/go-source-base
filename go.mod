@@ -19,7 +19,6 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/swaggo/echo-swagger v1.1.0
 	github.com/swaggo/swag v1.7.0
-	github.com/thecodingmachine/gotenberg-go-client/v7 v7.1.0
 	go.uber.org/zap v1.10.0
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 	gorm.io/datatypes v1.0.0

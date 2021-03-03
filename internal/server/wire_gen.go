@@ -10,6 +10,7 @@ import (
 	"mcm-api/pkg/authz"
 	"mcm-api/pkg/document"
 	"mcm-api/pkg/faculty"
+	"mcm-api/pkg/media"
 	"mcm-api/pkg/startup"
 	"mcm-api/pkg/user"
 )
@@ -32,6 +33,8 @@ func InitializeServer() *Server {
 	facultyRepository := faculty.InitializeRepository(db)
 	facultyService := faculty.InitializeService(config, facultyRepository, enforcer)
 	facultyHandler := faculty.NewHandler(config, facultyService)
-	server := newServer(config, startupService, handler, userHandler, documentHandler, facultyHandler)
+	mediaService := media.NewStorageService(config)
+	mediaHandler := media.NewHandler(config, mediaService)
+	server := newServer(config, startupService, handler, userHandler, documentHandler, facultyHandler, mediaHandler)
 	return server
 }

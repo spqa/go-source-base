@@ -19,6 +19,7 @@ import (
 	"mcm-api/pkg/document"
 	"mcm-api/pkg/faculty"
 	"mcm-api/pkg/log"
+	"mcm-api/pkg/media"
 	"mcm-api/pkg/user"
 )
 
@@ -75,4 +76,4 @@ func ProvideEnforcer(db *gorm.DB) *casbin.Enforcer {
 }
 
 var InfraSet = wire.NewSet(ProvideConfig, ProvideDB, ProvideRedis, ProvideEnforcer)
-var HandlerSet = wire.NewSet(document.NewDocumentHandler, user.NewUserHandler, authz.NewAuthHandler, faculty.NewHandler)
+var HandlerSet = wire.NewSet(document.NewDocumentHandler, user.NewUserHandler, authz.NewAuthHandler, faculty.NewHandler, media.NewHandler)

@@ -16,7 +16,8 @@ type Config struct {
 	JwtSecret        string `mapstructure:"jwt_secret"`
 	AdminEmail       string `mapstructure:"admin_email"`
 	AdminPassword    string `mapstructure:"admin_password"`
-	DocumentBucket   string `mapstructure:"document_bucket"`
+	MediaBucket      string `mapstructure:"media_bucket"`
+	ConverterService string `mapstructure:"converter_service"`
 }
 
 func (config *Config) GetDatabaseDsn() string {
