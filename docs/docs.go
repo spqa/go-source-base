@@ -909,6 +909,48 @@ var doc = `{
                 }
             }
         },
+        "/storage/upload": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Upload file",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Storage"
+                ],
+                "summary": "Upload file",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "file",
+                        "description": "account image",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/media.UploadResult"
+                        }
+                    }
+                }
+            }
+        },
         "/system-data": {
             "get": {
                 "security": [
@@ -1471,6 +1513,14 @@ var doc = `{
         },
         "faculty.FacultyUpdateReq": {
             "type": "object"
+        },
+        "media.UploadResult": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                }
+            }
         },
         "systemdata.DataRes": {
             "type": "object",

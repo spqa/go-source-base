@@ -18,7 +18,8 @@ type Config struct {
 	AdminEmail       string `mapstructure:"admin_email"`
 	AdminPassword    string `mapstructure:"admin_password"`
 	SesSenderEmail   string `mapstructure:"ses_sender_email"`
-	DocumentBucket   string `mapstructure:"document_bucket"`
+	MediaBucket      string `mapstructure:"media_bucket"`
+	ConverterService string `mapstructure:"converter_service"`
 }
 
 func (config *Config) GetDatabaseDsn() string {

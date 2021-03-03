@@ -178,6 +178,11 @@ definitions:
     type: object
   faculty.FacultyUpdateReq:
     type: object
+  media.UploadResult:
+    properties:
+      key:
+        type: string
+    type: object
   systemdata.DataRes:
     additionalProperties:
       type: string
@@ -759,6 +764,32 @@ paths:
       summary: Update a faculty
       tags:
       - Faculties
+  /storage/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload file
+      parameters:
+      - in: query
+        name: type
+        type: string
+      - description: account image
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/media.UploadResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Upload file
+      tags:
+      - Storage
   /system-data:
     get:
       consumes:

@@ -1,6 +1,8 @@
 package media
 
 import (
+	"bytes"
+	"context"
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -13,6 +15,7 @@ import (
 	"mcm-api/config"
 	"mcm-api/pkg/apperror"
 	"mcm-api/pkg/log"
+	"strconv"
 	"time"
 )
 
@@ -25,9 +28,16 @@ var allowedPreviewDocumentMimeTypes = []string{
 	"application/pdf",
 }
 
-type StorageService interface {
-	UploadDocumentOriginal(stream io.Reader, metadata map[string]*string) (*UploadResult, error)
-	UploadDocumentPreview(stream io.Reader, metadata map[string]*string) (*UploadResult, error)
+const (
+	documentSizeLimit = 32 << 20
+	imageSizeLimit    = 15 << 20
+)
+
+type Service interface {
+	GetUrl(ctx context.Context, key string) (string, error)
+	GetFile(ctx context.Context, key string) (io.ReadCloser, error)
+	UploadDocumentOriginal(ctx context.Context, req *FileUploadOriginalReq) (*UploadResult, error)
+	UploadDocumentPreview(ctx context.Context, req *FileUploadPreviewReq) (*UploadResult, error)
 }
 
 type S3StorageService struct {
@@ -36,17 +46,69 @@ type S3StorageService struct {
 	config    *config.Config
 }
 
-func NewStorageService(config *config.Config) StorageService {
+func NewStorageService(config *config.Config) Service {
 	sess := session.Must(session.NewSession(&aws.Config{Region: aws.String("ap-southeast-1")}))
 	return &S3StorageService{
+		s3:        s3.New(sess),
 		s3manager: s3manager.NewUploader(sess),
 		config:    config,
 	}
 }
 
-func (s S3StorageService) GeneratePresignUrl(bucket, key string) (string, error) {
+func (s S3StorageService) UploadDocumentOriginal(ctx context.Context, req *FileUploadOriginalReq) (*UploadResult, error) {
+	if req.Size > documentSizeLimit {
+		return nil, apperror.New(apperror.ErrInvalid, "file too large", nil)
+	}
+	m, originalReader, err := validateMime(req.File, allowedOriginalDocumentMimeTypes)
+	if err != nil {
+		return nil, err
+	}
+	return s.uploadDocument(ctx, originalReader, map[string]*string{
+		"userId":       aws.String(strconv.Itoa(req.User.Id)),
+		"originalName": aws.String(req.Name),
+	}, m)
+}
+
+func (s S3StorageService) UploadDocumentPreview(ctx context.Context, req *FileUploadPreviewReq) (*UploadResult, error) {
+	m, originalReader, err := validateMime(req.File, allowedPreviewDocumentMimeTypes)
+	if err != nil {
+		return nil, err
+	}
+	return s.uploadDocument(ctx, originalReader, map[string]*string{
+		"userId":       aws.String(strconv.Itoa(req.User.Id)),
+		"originalName": aws.String(req.Name),
+	}, m)
+}
+
+func (s S3StorageService) GetUrl(ctx context.Context, key string) (string, error) {
+	select {
+	case <-ctx.Done():
+		return "", ctx.Err()
+	default:
+		return s.generatePresignUrl(key)
+	}
+}
+
+func (s S3StorageService) GetFile(ctx context.Context, key string) (io.ReadCloser, error) {
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	default:
+		object, err := s.s3.GetObjectWithContext(ctx,
+			&s3.GetObjectInput{
+				Key:    aws.String(key),
+				Bucket: aws.String(s.config.MediaBucket),
+			})
+		if err != nil {
+			return nil, err
+		}
+		return object.Body, err
+	}
+}
+
+func (s S3StorageService) generatePresignUrl(key string) (string, error) {
 	req, _ := s.s3.GetObjectRequest(&s3.GetObjectInput{
-		Bucket: aws.String(bucket),
+		Bucket: aws.String(s.config.MediaBucket),
 		Key:    aws.String(key),
 	})
 	urlStr, err := req.Presign(15 * time.Minute)
@@ -56,21 +118,20 @@ func (s S3StorageService) GeneratePresignUrl(bucket, key string) (string, error)
 	return urlStr, nil
 }
 
-func (s *S3StorageService) uploadDocument(stream io.Reader, metadata map[string]*string, m *mimetype.MIME) (*UploadResult, error) {
+func (s *S3StorageService) uploadDocument(ctx context.Context, stream io.Reader, metadata map[string]*string, m *mimetype.MIME) (*UploadResult, error) {
 	id, err := uuid.NewRandom()
 	if err != nil {
 		return nil, err
 	}
 	key := id.String() + m.Extension()
-	output, err := s.s3manager.Upload(&s3manager.UploadInput{
+	output, err := s.s3manager.UploadWithContext(ctx, &s3manager.UploadInput{
 		ACL:         aws.String(s3.ObjectCannedACLPrivate),
 		Body:        stream,
-		Bucket:      aws.String(s.config.DocumentBucket),
+		Bucket:      aws.String(s.config.MediaBucket),
 		Key:         aws.String(key),
 		ContentType: aws.String(m.String()),
 		Metadata:    metadata,
 	})
-	fmt.Println(output)
 	if err != nil {
 		return nil, err
 	}
@@ -78,38 +139,29 @@ func (s *S3StorageService) uploadDocument(stream io.Reader, metadata map[string]
 	return &UploadResult{Key: key}, nil
 }
 
-func (s S3StorageService) UploadDocumentOriginal(stream io.Reader, metadata map[string]*string) (*UploadResult, error) {
-	m, err := mimetype.DetectReader(stream)
-	if err != nil {
-		return nil, err
+func validateMime(r io.Reader, allowedMimes []string) (*mimetype.MIME, io.Reader, error) {
+	in := make([]byte, 3072)
+	n, err := io.ReadFull(r, in)
+	if err != nil && err != io.EOF && err != io.ErrUnexpectedEOF {
+		return nil, nil, err
 	}
+	in = in[:n]
+	m := mimetype.Detect(in)
 	isAllowed := false
-	for i := range allowedOriginalDocumentMimeTypes {
-		if m.Is(allowedOriginalDocumentMimeTypes[i]) {
+	for i := range allowedMimes {
+		if m.Is(allowedMimes[i]) {
 			isAllowed = true
 			break
 		}
 	}
 	if !isAllowed {
-		return nil, apperror.New(apperror.ErrInvalid, "file type not accepted", nil)
+		return nil, nil, apperror.New(
+			apperror.ErrInvalid,
+			fmt.Sprintf("file type not accepted: %v", m.String()),
+			nil,
+		)
 	}
-	return s.uploadDocument(stream, metadata, m)
-}
 
-func (s S3StorageService) UploadDocumentPreview(stream io.Reader, metadata map[string]*string) (*UploadResult, error) {
-	m, err := mimetype.DetectReader(stream)
-	if err != nil {
-		return nil, err
-	}
-	isAllowed := false
-	for i := range allowedPreviewDocumentMimeTypes {
-		if m.Is(allowedOriginalDocumentMimeTypes[i]) {
-			isAllowed = true
-			break
-		}
-	}
-	if !isAllowed {
-		return nil, apperror.New(apperror.ErrInvalid, "file type not accepted", nil)
-	}
-	return s.uploadDocument(stream, metadata, m)
+	concatHeaderAndReader := io.MultiReader(bytes.NewReader(in), r)
+	return m, concatHeaderAndReader, nil
 }
