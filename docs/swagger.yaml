@@ -173,10 +173,25 @@ definitions:
         type: array
     type: object
   faculty.FacultyCreateReq:
+    properties:
+      name:
+        type: string
     type: object
   faculty.FacultyResponse:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updatedAt:
+        type: string
     type: object
   faculty.FacultyUpdateReq:
+    properties:
+      name:
+        type: string
     type: object
   media.UploadResult:
     properties:

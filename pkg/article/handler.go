@@ -36,7 +36,7 @@ func (h *Handler) Register(group *echo.Group) {
 // @Security ApiKeyAuth
 // @Router /articles/{id} [get]
 func (h *Handler) getById(context echo.Context) error {
-	id, err := strconv.Atoi(context.Get("id").(string))
+	id, err := strconv.Atoi(context.Param("id"))
 	if err != nil {
 		return err
 	}

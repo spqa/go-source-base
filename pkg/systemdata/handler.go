@@ -53,7 +53,7 @@ func (h *Handler) index(context echo.Context) error {
 // @Security ApiKeyAuth
 // @Router /system-data/{id} [put]
 func (h *Handler) update(context echo.Context) error {
-	id := context.Get("id").(string)
+	id := context.Param("id")
 	body := new(DataUpdateReq)
 	err := context.Bind(body)
 	if err != nil {

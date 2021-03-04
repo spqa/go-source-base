@@ -63,7 +63,7 @@ func (h *Handler) index(context echo.Context) error {
 // @Security ApiKeyAuth
 // @Router /contribute-sessions/{id} [get]
 func (h *Handler) getById(context echo.Context) error {
-	id, err := strconv.Atoi(context.Get("id").(string))
+	id, err := strconv.Atoi(context.Param("id"))
 	if err != nil {
 		return err
 	}

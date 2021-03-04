@@ -62,7 +62,7 @@ func (h *Handler) index(context echo.Context) error {
 // @Security ApiKeyAuth
 // @Router /contributions/{id} [get]
 func (h *Handler) getById(context echo.Context) error {
-	id, err := strconv.Atoi(context.Get("id").(string))
+	id, err := strconv.Atoi(context.Param("id"))
 	if err != nil {
 		return err
 	}
@@ -106,7 +106,7 @@ func (h *Handler) create(context echo.Context) error {
 // @Security ApiKeyAuth
 // @Router /contributions/{id} [put]
 func (h *Handler) update(context echo.Context) error {
-	id, err := strconv.Atoi(context.Get("id").(string))
+	id, err := strconv.Atoi(context.Param("id"))
 	if err != nil {
 		return apperror.HandleError(err, context)
 	}
@@ -132,7 +132,7 @@ func (h *Handler) update(context echo.Context) error {
 // @Security ApiKeyAuth
 // @Router /contributions/{id} [delete]
 func (h *Handler) delete(context echo.Context) error {
-	id, err := strconv.Atoi(context.Get("id").(string))
+	id, err := strconv.Atoi(context.Param("id"))
 	if err != nil {
 		return apperror.HandleError(err, context)
 	}

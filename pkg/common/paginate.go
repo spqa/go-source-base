@@ -39,7 +39,7 @@ func NewPaginateResponse(data interface{}, total int64, page int, limit int) *Pa
 
 func calculateLastPage(total int64, limit int) int {
 	if total%int64(limit) > 0 {
-		return int((total / int64(limit)) + 1)
+		return int(total / int64(limit))
 	}
-	return int(total / int64(limit))
+	return int(total/int64(limit)) - 1
 }
