@@ -8,9 +8,12 @@ package server
 import (
 	"mcm-api/internal/core"
 	"mcm-api/pkg/authz"
+	"mcm-api/pkg/contributesession"
+	"mcm-api/pkg/contribution"
 	"mcm-api/pkg/document"
 	"mcm-api/pkg/faculty"
 	"mcm-api/pkg/media"
+	"mcm-api/pkg/queue"
 	"mcm-api/pkg/startup"
 	"mcm-api/pkg/user"
 )
@@ -33,8 +36,17 @@ func InitializeServer() *Server {
 	facultyRepository := faculty.InitializeRepository(db)
 	facultyService := faculty.InitializeService(config, facultyRepository, enforcer)
 	facultyHandler := faculty.NewHandler(config, facultyService)
-	mediaService := media.NewStorageService(config)
+	imageProxyService := media.NewDarthsimImageProxyService(config)
+	mediaService := media.NewStorageService(config, imageProxyService)
 	mediaHandler := media.NewHandler(config, mediaService)
-	server := newServer(config, startupService, handler, userHandler, documentHandler, facultyHandler, mediaHandler)
+	contributesessionRepository := contributesession.InitializeRepository(db)
+	contributesessionService := contributesession.InitializeService(config, contributesessionRepository, enforcer)
+	contributesessionHandler := contributesession.NewHandler(config, contributesessionService)
+	contributionRepository := contribution.InitializeRepository(db)
+	client := core.ProvideRedis(config)
+	queueQueue := queue.InitializeRedisQueue(config, client)
+	contributionService := contribution.InitializeService(config, contributionRepository, enforcer, queueQueue)
+	contributionHandler := contribution.NewHandler(config, contributionService)
+	server := newServer(config, startupService, handler, userHandler, documentHandler, facultyHandler, mediaHandler, contributesessionHandler, contributionHandler)
 	return server
 }

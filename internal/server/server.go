@@ -9,6 +9,8 @@ import (
 	"mcm-api/config"
 	"mcm-api/docs"
 	"mcm-api/pkg/authz"
+	"mcm-api/pkg/contributesession"
+	"mcm-api/pkg/contribution"
 	"mcm-api/pkg/document"
 	"mcm-api/pkg/faculty"
 	"mcm-api/pkg/log"
@@ -21,14 +23,16 @@ import (
 )
 
 type Server struct {
-	config          *config.Config
-	echo            *echo.Echo
-	startupService  *startup.Service
-	authHandler     *authz.Handler
-	userHandler     *user.Handler
-	documentHandler *document.Handler
-	faculty         *faculty.Handler
-	storage         *media.Handler
+	config            *config.Config
+	echo              *echo.Echo
+	startupService    *startup.Service
+	authHandler       *authz.Handler
+	userHandler       *user.Handler
+	documentHandler   *document.Handler
+	faculty           *faculty.Handler
+	storage           *media.Handler
+	contributeSession *contributesession.Handler
+	contribution      *contribution.Handler
 }
 
 func newServer(
@@ -39,6 +43,8 @@ func newServer(
 	documentHandler *document.Handler,
 	facultyHandler *faculty.Handler,
 	storage *media.Handler,
+	contributeSession *contributesession.Handler,
+	contribution *contribution.Handler,
 ) *Server {
 	e := echo.New()
 	e.HideBanner = true
@@ -51,14 +57,16 @@ func newServer(
 		},
 	}))
 	return &Server{
-		config:          config,
-		echo:            e,
-		startupService:  startupService,
-		authHandler:     authHandler,
-		userHandler:     userHandler,
-		documentHandler: documentHandler,
-		faculty:         facultyHandler,
-		storage:         storage,
+		config:            config,
+		echo:              e,
+		startupService:    startupService,
+		authHandler:       authHandler,
+		userHandler:       userHandler,
+		documentHandler:   documentHandler,
+		faculty:           facultyHandler,
+		storage:           storage,
+		contributeSession: contributeSession,
+		contribution:      contribution,
 	}
 }
 
@@ -68,6 +76,8 @@ func (s *Server) registerHandler() {
 	s.documentHandler.Register(s.echo.Group("documents"))
 	s.faculty.Register(s.echo.Group("faculties"))
 	s.storage.Register(s.echo.Group("storage"))
+	s.contributeSession.Register(s.echo.Group("contribute-sessions"))
+	s.contribution.Register(s.echo.Group("contributions"))
 }
 
 // @securityDefinitions.apikey ApiKeyAuth

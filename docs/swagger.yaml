@@ -770,10 +770,13 @@ paths:
       - multipart/form-data
       description: Upload file
       parameters:
-      - in: query
+      - enum:
+        - document
+        - image
+        in: query
         name: type
         type: string
-      - description: account image
+      - description: upload file
         in: formData
         name: file
         required: true

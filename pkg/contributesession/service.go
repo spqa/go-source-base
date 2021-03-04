@@ -4,10 +4,12 @@ import (
 	"context"
 	"errors"
 	"github.com/casbin/casbin/v2"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"mcm-api/config"
 	"mcm-api/pkg/apperror"
 	"mcm-api/pkg/common"
+	"mcm-api/pkg/log"
 	"time"
 )
 
@@ -38,7 +40,7 @@ func (s Service) Find(ctx context.Context, query *IndexQuery) (*common.PaginateR
 	return common.NewPaginateResponse(res, count, query.Page, query.GetLimit()), nil
 }
 
-func (s Service) FindById(ctx context.Context, id int64) (*SessionRes, error) {
+func (s Service) FindById(ctx context.Context, id int) (*SessionRes, error) {
 	entity, err := s.repository.FindById(ctx, id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -53,15 +55,66 @@ func (s Service) Create(ctx context.Context, body *SessionCreateReq) (*SessionRe
 	if err := body.Validate(); err != nil {
 		return nil, err
 	}
-
-	return nil, nil
+	lastSession, err := s.repository.GetLastSession(ctx)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		if body.OpenTime.Before(lastSession.FinalClosureTime) || body.OpenTime.Equal(lastSession.FinalClosureTime) {
+			return nil, apperror.New(apperror.ErrConflict, "conflict with last contribute session", nil)
+		}
+	}
+	entity, err := s.repository.Create(ctx, &Entity{
+		OpenTime:         body.OpenTime,
+		ClosureTime:      body.ClosureTime,
+		FinalClosureTime: body.FinalClosureTime,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return mapEntityToRes(entity), nil
 }
 
 func (s Service) Update(ctx context.Context, id int, body *SessionUpdateReq) (*SessionRes, error) {
-	return nil, nil
+	entity, err := s.repository.FindById(ctx, id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, apperror.New(apperror.ErrNotFound, "contribute session not found", err)
+		}
+		return nil, err
+	}
+	lastSession, err := s.repository.GetLastSession(ctx, id)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	if err == nil {
+		if body.OpenTime.Before(lastSession.FinalClosureTime) || body.OpenTime.Equal(lastSession.FinalClosureTime) {
+			return nil, apperror.New(apperror.ErrConflict, "conflict with last contribute session", nil)
+		}
+	}
+	entity.OpenTime = body.OpenTime
+	entity.ClosureTime = body.ClosureTime
+	entity.FinalClosureTime = body.FinalClosureTime
+	entity, err = s.repository.Update(ctx, entity)
+	if err != nil {
+		return nil, err
+	}
+	return mapEntityToRes(entity), nil
 }
 
 func (s Service) Delete(ctx context.Context, id int) error {
+	hasContribution, err := s.repository.HasContribution(ctx, id)
+	if err != nil {
+		return err
+	}
+	if hasContribution {
+		return apperror.New(apperror.ErrInvalid, "cant delete session that has contribution", nil)
+	}
+	err = s.repository.Delete(ctx, id)
+	if err != nil {
+		return err
+	}
+	log.Logger.Debug("deleted contribution session", zap.Int("id", id))
 	return nil
 }
 

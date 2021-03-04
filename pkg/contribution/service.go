@@ -13,7 +13,7 @@ type Service struct {
 	cfg                      *config.Config
 	repository               *repository
 	enforcer                 *casbin.Enforcer
-	queue                    *queue.Queue
+	queue                    queue.Queue
 	contributeSessionService *contributesession.Service
 }
 
@@ -21,7 +21,7 @@ func InitializeService(
 	cfg *config.Config,
 	repository *repository,
 	enforcer *casbin.Enforcer,
-	queue *queue.Queue,
+	queue queue.Queue,
 ) *Service {
 	return &Service{
 		queue:      queue,

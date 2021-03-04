@@ -30,5 +30,5 @@ type FileUploadPreviewReq struct {
 }
 
 type UploadQuery struct {
-	Type UploadType `query:"type"`
+	Type UploadType `query:"type" enums:"document,image"`
 }

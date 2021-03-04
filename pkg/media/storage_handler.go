@@ -33,7 +33,7 @@ func (h *Handler) Register(group *echo.Group) {
 // @Accept  multipart/form-data
 // @Produce  json
 // @Param params query media.UploadQuery true "query"
-// @Param file formData file true "account image"
+// @Param file formData file true "upload file"
 // @Success 200 {object} media.UploadResult
 // @Security ApiKeyAuth
 // @Router /storage/upload [post]
@@ -66,6 +66,12 @@ func (h *Handler) upload(ctx echo.Context) error {
 		})
 		break
 	case Image:
+		result, err = h.service.UploadImage(ctx.Request().Context(), &FileUploadOriginalReq{
+			File: open,
+			Size: file.Size,
+			Name: file.Filename,
+			User: user,
+		})
 	default:
 		return apperror.HandleError(apperror.New(apperror.ErrInvalid, "unknown upload type", nil), ctx)
 	}

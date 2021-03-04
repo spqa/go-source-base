@@ -109,6 +109,8 @@ func HandleError(err error, ctx echo.Context) error {
 		return e.ToResponse(ctx)
 	case validation.Errors:
 		return New(ErrInvalid, "", err).WithData(err).ToResponse(ctx)
+	case *echo.HTTPError:
+		return New(ErrInvalid, e.Unwrap().Error(), e.Unwrap()).ToResponse(ctx)
 	default:
 		log.Logger.Error("unhandled error", zap.Error(err))
 		return ctx.JSON(http.StatusInternalServerError, appErrorRes{

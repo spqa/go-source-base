@@ -28,6 +28,13 @@ var allowedPreviewDocumentMimeTypes = []string{
 	"application/pdf",
 }
 
+var allowedImageMimeTypes = []string{
+	"image/jpeg",
+	"image/png",
+	"image/webp",
+	"image/svg+xml",
+}
+
 const (
 	documentSizeLimit = 32 << 20
 	imageSizeLimit    = 15 << 20
@@ -35,23 +42,27 @@ const (
 
 type Service interface {
 	GetUrl(ctx context.Context, key string) (string, error)
+	GetImageLink(key string) string
 	GetFile(ctx context.Context, key string) (io.ReadCloser, error)
 	UploadDocumentOriginal(ctx context.Context, req *FileUploadOriginalReq) (*UploadResult, error)
 	UploadDocumentPreview(ctx context.Context, req *FileUploadPreviewReq) (*UploadResult, error)
+	UploadImage(ctx context.Context, req *FileUploadOriginalReq) (*UploadResult, error)
 }
 
 type S3StorageService struct {
 	s3        *s3.S3
 	s3manager *s3manager.Uploader
 	config    *config.Config
+	proxy     ImageProxyService
 }
 
-func NewStorageService(config *config.Config) Service {
+func NewStorageService(config *config.Config, proxy ImageProxyService) Service {
 	sess := session.Must(session.NewSession(&aws.Config{Region: aws.String("ap-southeast-1")}))
 	return &S3StorageService{
 		s3:        s3.New(sess),
 		s3manager: s3manager.NewUploader(sess),
 		config:    config,
+		proxy:     proxy,
 	}
 }
 
@@ -63,7 +74,7 @@ func (s S3StorageService) UploadDocumentOriginal(ctx context.Context, req *FileU
 	if err != nil {
 		return nil, err
 	}
-	return s.uploadDocument(ctx, originalReader, map[string]*string{
+	return s.upload(ctx, originalReader, map[string]*string{
 		"userId":       aws.String(strconv.Itoa(req.User.Id)),
 		"originalName": aws.String(req.Name),
 	}, m)
@@ -74,7 +85,18 @@ func (s S3StorageService) UploadDocumentPreview(ctx context.Context, req *FileUp
 	if err != nil {
 		return nil, err
 	}
-	return s.uploadDocument(ctx, originalReader, map[string]*string{
+	return s.upload(ctx, originalReader, map[string]*string{
+		"userId":       aws.String(strconv.Itoa(req.User.Id)),
+		"originalName": aws.String(req.Name),
+	}, m)
+}
+
+func (s S3StorageService) UploadImage(ctx context.Context, req *FileUploadOriginalReq) (*UploadResult, error) {
+	m, originalReader, err := validateMime(req.File, allowedImageMimeTypes)
+	if err != nil {
+		return nil, err
+	}
+	return s.upload(ctx, originalReader, map[string]*string{
 		"userId":       aws.String(strconv.Itoa(req.User.Id)),
 		"originalName": aws.String(req.Name),
 	}, m)
@@ -106,6 +128,10 @@ func (s S3StorageService) GetFile(ctx context.Context, key string) (io.ReadClose
 	}
 }
 
+func (s S3StorageService) GetImageLink(key string) string {
+	return s.proxy.GetLink(key)
+}
+
 func (s S3StorageService) generatePresignUrl(key string) (string, error) {
 	req, _ := s.s3.GetObjectRequest(&s3.GetObjectInput{
 		Bucket: aws.String(s.config.MediaBucket),
@@ -118,7 +144,7 @@ func (s S3StorageService) generatePresignUrl(key string) (string, error) {
 	return urlStr, nil
 }
 
-func (s *S3StorageService) uploadDocument(ctx context.Context, stream io.Reader, metadata map[string]*string, m *mimetype.MIME) (*UploadResult, error) {
+func (s *S3StorageService) upload(ctx context.Context, stream io.Reader, metadata map[string]*string, m *mimetype.MIME) (*UploadResult, error) {
 	id, err := uuid.NewRandom()
 	if err != nil {
 		return nil, err

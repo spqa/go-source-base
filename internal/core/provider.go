@@ -16,10 +16,13 @@ import (
 	"gorm.io/gorm"
 	"mcm-api/config"
 	"mcm-api/pkg/authz"
+	"mcm-api/pkg/contributesession"
+	"mcm-api/pkg/contribution"
 	"mcm-api/pkg/document"
 	"mcm-api/pkg/faculty"
 	"mcm-api/pkg/log"
 	"mcm-api/pkg/media"
+	"mcm-api/pkg/queue"
 	"mcm-api/pkg/user"
 )
 
@@ -75,5 +78,19 @@ func ProvideEnforcer(db *gorm.DB) *casbin.Enforcer {
 	return e
 }
 
-var InfraSet = wire.NewSet(ProvideConfig, ProvideDB, ProvideRedis, ProvideEnforcer)
-var HandlerSet = wire.NewSet(document.NewDocumentHandler, user.NewUserHandler, authz.NewAuthHandler, faculty.NewHandler, media.NewHandler)
+var InfraSet = wire.NewSet(
+	ProvideConfig,
+	ProvideDB,
+	ProvideRedis,
+	ProvideEnforcer,
+	queue.InitializeRedisQueue,
+)
+var HandlerSet = wire.NewSet(
+	document.NewDocumentHandler,
+	user.NewUserHandler,
+	authz.NewAuthHandler,
+	faculty.NewHandler,
+	media.NewHandler,
+	contributesession.NewHandler,
+	contribution.NewHandler,
+)

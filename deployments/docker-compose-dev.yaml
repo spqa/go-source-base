@@ -1,4 +1,4 @@
-version: '3'
+version: '3.2'
 services:
   db:
     image: postgres
@@ -17,3 +17,9 @@ services:
     image: thecodingmachine/gotenberg:6
     ports:
       - 3001:3000
+  image-proxy-service:
+    image: darthsim/imgproxy:latest
+    ports:
+      - 3002:8080
+    env_file:
+      - ../.env

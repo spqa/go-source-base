@@ -928,13 +928,17 @@ var doc = `{
                 "summary": "Upload file",
                 "parameters": [
                     {
+                        "enum": [
+                            "document",
+                            "image"
+                        ],
                         "type": "string",
                         "name": "type",
                         "in": "query"
                     },
                     {
                         "type": "file",
-                        "description": "account image",
+                        "description": "upload file",
                         "name": "file",
                         "in": "formData",
                         "required": true

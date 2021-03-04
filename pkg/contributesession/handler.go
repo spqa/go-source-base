@@ -26,9 +26,9 @@ func (h *Handler) Register(group *echo.Group) {
 	group.GET("", h.index)
 	group.GET("/:id", h.getById)
 	group.POST("", h.create)
-	group.POST(":id/export", h.create)
-	group.PUT(":id", h.update)
-	group.DELETE(":id", h.delete)
+	group.POST("/:id/export", h.create)
+	group.PUT("/:id", h.update)
+	group.DELETE("/:id", h.delete)
 }
 
 // @Tags Contribute Sessions
@@ -107,7 +107,7 @@ func (h *Handler) create(context echo.Context) error {
 // @Security ApiKeyAuth
 // @Router /contribute-sessions/{id} [put]
 func (h *Handler) update(context echo.Context) error {
-	id, err := strconv.Atoi(context.Get("id").(string))
+	id, err := strconv.Atoi(context.Param("id"))
 	if err != nil {
 		return apperror.HandleError(err, context)
 	}
@@ -133,7 +133,7 @@ func (h *Handler) update(context echo.Context) error {
 // @Security ApiKeyAuth
 // @Router /contribute-sessions/{id} [delete]
 func (h *Handler) delete(context echo.Context) error {
-	id, err := strconv.Atoi(context.Get("id").(string))
+	id, err := strconv.Atoi(context.Param("id"))
 	if err != nil {
 		return apperror.HandleError(err, context)
 	}
