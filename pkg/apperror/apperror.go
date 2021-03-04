@@ -95,6 +95,13 @@ func valueOrDefault(str string, def string) string {
 	return str
 }
 
+func Is(err error, code AppErrCode) bool {
+	if v, ok := err.(*appError); ok {
+		return v.Code == code
+	}
+	return false
+}
+
 func New(code AppErrCode, message string, err error) *appError {
 	return &appError{
 		Code:    code,

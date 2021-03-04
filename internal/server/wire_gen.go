@@ -45,7 +45,7 @@ func InitializeServer() *Server {
 	contributionRepository := contribution.InitializeRepository(db)
 	client := core.ProvideRedis(config)
 	queueQueue := queue.InitializeRedisQueue(config, client)
-	contributionService := contribution.InitializeService(config, contributionRepository, enforcer, queueQueue)
+	contributionService := contribution.InitializeService(config, contributionRepository, enforcer, queueQueue, contributesessionService)
 	contributionHandler := contribution.NewHandler(config, contributionService)
 	server := newServer(config, startupService, handler, userHandler, documentHandler, facultyHandler, mediaHandler, contributesessionHandler, contributionHandler)
 	return server

@@ -1,5 +1,10 @@
 package common
 
+const (
+	limitDefault = 20
+	limitMax     = 100
+)
+
 type PaginateQuery struct {
 	Limit int `query:"limit"`
 	Page  int `query:"page"`
@@ -10,11 +15,11 @@ func (q PaginateQuery) GetOffSet() int {
 }
 
 func (q PaginateQuery) GetLimit() int {
-	if q.Limit > 50 {
-		return 50
+	if q.Limit > limitMax {
+		return limitMax
 	}
 	if q.Limit <= 0 {
-		return 20
+		return limitDefault
 	}
 	return q.Limit
 }
@@ -25,6 +30,16 @@ type PaginateResponse struct {
 	LastPage    int         `json:"lastPage"`
 	PerPage     int         `json:"perPage"`
 	Data        interface{} `json:"data"`
+}
+
+func NewEmptyPaginateResponse() *PaginateResponse {
+	return &PaginateResponse{
+		Total:       0,
+		CurrentPage: 0,
+		LastPage:    0,
+		PerPage:     limitDefault,
+		Data:        nil,
+	}
 }
 
 func NewPaginateResponse(data interface{}, total int64, page int, limit int) *PaginateResponse {
@@ -38,6 +53,9 @@ func NewPaginateResponse(data interface{}, total int64, page int, limit int) *Pa
 }
 
 func calculateLastPage(total int64, limit int) int {
+	if total == 0 {
+		return 0
+	}
 	if total%int64(limit) > 0 {
 		return int(total / int64(limit))
 	}

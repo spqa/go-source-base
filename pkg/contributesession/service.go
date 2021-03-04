@@ -123,7 +123,7 @@ func (s Service) GetCurrentSession(ctx context.Context) (*SessionRes, error) {
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, apperror.New(
 			apperror.ErrNotFound,
-			"there is not contribution session at current time", err)
+			"there is no contribution session at current time", err)
 	}
 	if err != nil {
 		return nil, err
