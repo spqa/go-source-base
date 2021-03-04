@@ -19,7 +19,6 @@ import (
 	"mcm-api/pkg/document"
 	"mcm-api/pkg/faculty"
 	"mcm-api/pkg/log"
-	"mcm-api/pkg/queue"
 	"mcm-api/pkg/media"
 	"mcm-api/pkg/user"
 )

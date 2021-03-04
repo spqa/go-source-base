@@ -54,5 +54,5 @@ func (r repository) FindSessionFromTime(ctx context.Context, time time.Time) (*E
 }
 
 func (r repository) FindAndCount(ctx context.Context, query *IndexQuery) ([]*Entity, int64, error) {
-
+	return nil, 0, nil
 }
