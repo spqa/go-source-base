@@ -43,3 +43,28 @@ func (r repository) Update(ctx context.Context, entity *Entity) (*Entity, error)
 func (r repository) Delete(ctx context.Context, id int) error {
 	return r.db.WithContext(ctx).Delete(id).Error
 }
+
+func (r repository) FindAndCount(ctx context.Context, query *IndexQuery) ([]*Entity, int64, error) {
+	var entities []*Entity
+	builder := r.db.WithContext(ctx).Model(&Entity{})
+	if query.Status != "" {
+		builder.Where("status = ?", query.Status)
+	}
+	if query.FacultyId != nil {
+		builder.Where("faculty_id = ?", query.FacultyId)
+	}
+	if query.StudentId != nil {
+		builder.Where("user_id = ?", query.StudentId)
+	}
+	if query.ContributionSessionId != nil {
+		builder.Where("contribute_session_id = ?", query.ContributionSessionId)
+	}
+	var count int64
+	result := builder.Count(&count)
+	if result.Error != nil {
+		return nil, 0, nil
+	}
+	builder.Offset(query.GetOffSet()).Limit(query.GetLimit())
+	result = builder.Find(&entities)
+	return entities, count, result.Error
+}

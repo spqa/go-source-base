@@ -506,12 +506,37 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "name": "contributionSessionId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "facultyId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
                         "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "accepted",
+                            "rejected",
+                            "reviewing"
+                        ],
+                        "type": "string",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "studentId",
                         "in": "query"
                     }
                 ],
@@ -1288,6 +1313,9 @@
                 "email": {
                     "type": "string"
                 },
+                "facultyId": {
+                    "type": "integer"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -1572,6 +1600,9 @@
                 },
                 "email": {
                     "type": "string"
+                },
+                "facultyId": {
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"

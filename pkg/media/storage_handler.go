@@ -40,7 +40,10 @@ func (h *Handler) Register(group *echo.Group) {
 func (h *Handler) upload(ctx echo.Context) error {
 	query := new(UploadQuery)
 	_ = ctx.Bind(query)
-	user := common.GetLoggedInUser(ctx)
+	user, err := common.GetLoggedInUser(ctx.Request().Context())
+	if err != nil {
+		return apperror.HandleError(err, ctx)
+	}
 	file, err := ctx.FormFile("file")
 	if err != nil {
 		if errors.Is(err, http.ErrMissingFile) {

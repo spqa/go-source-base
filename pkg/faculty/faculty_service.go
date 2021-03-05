@@ -3,7 +3,6 @@ package faculty
 import (
 	"context"
 	"errors"
-	"github.com/casbin/casbin/v2"
 	"gorm.io/gorm"
 	"mcm-api/config"
 	"mcm-api/pkg/apperror"
@@ -13,18 +12,15 @@ import (
 type Service struct {
 	cfg        *config.Config
 	repository *repository
-	enforcer   *casbin.Enforcer
 }
 
 func InitializeService(
 	cfg *config.Config,
 	repository *repository,
-	enforcer *casbin.Enforcer,
 ) *Service {
 	return &Service{
 		cfg:        cfg,
 		repository: repository,
-		enforcer:   enforcer,
 	}
 }
 

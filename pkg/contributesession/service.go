@@ -3,7 +3,6 @@ package contributesession
 import (
 	"context"
 	"errors"
-	"github.com/casbin/casbin/v2"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"mcm-api/config"
@@ -16,18 +15,15 @@ import (
 type Service struct {
 	cfg        *config.Config
 	repository *repository
-	enforcer   *casbin.Enforcer
 }
 
 func InitializeService(
 	cfg *config.Config,
 	repository *repository,
-	enforcer *casbin.Enforcer,
 ) *Service {
 	return &Service{
 		cfg:        cfg,
 		repository: repository,
-		enforcer:   enforcer,
 	}
 }
 

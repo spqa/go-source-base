@@ -2,7 +2,6 @@ package contribution
 
 import (
 	"context"
-	"github.com/casbin/casbin/v2"
 	"mcm-api/config"
 	"mcm-api/pkg/apperror"
 	"mcm-api/pkg/common"
@@ -13,7 +12,6 @@ import (
 type Service struct {
 	cfg                      *config.Config
 	repository               *repository
-	enforcer                 *casbin.Enforcer
 	queue                    queue.Queue
 	contributeSessionService *contributesession.Service
 }
@@ -21,7 +19,6 @@ type Service struct {
 func InitializeService(
 	cfg *config.Config,
 	repository *repository,
-	enforcer *casbin.Enforcer,
 	queue queue.Queue,
 	cs *contributesession.Service,
 ) *Service {
@@ -29,21 +26,58 @@ func InitializeService(
 		queue:                    queue,
 		cfg:                      cfg,
 		repository:               repository,
-		enforcer:                 enforcer,
 		contributeSessionService: cs,
 	}
 }
 
 func (s Service) Find(ctx context.Context, query *IndexQuery) (*common.PaginateResponse, error) {
-	session, err := s.contributeSessionService.GetCurrentSession(ctx)
-	if err != nil && !apperror.Is(err, apperror.ErrNotFound) {
+	user, err := common.GetLoggedInUser(ctx)
+	if err != nil {
 		return nil, err
 	}
-	if session == nil {
-		return common.NewEmptyPaginateResponse(), nil
+	var result []*Entity
+	var count int64
+	switch user.Role {
+	case common.MarketingManager:
+		result, count, err = s.repository.FindAndCount(ctx, &IndexQuery{
+			PaginateQuery:         query.PaginateQuery,
+			FacultyId:             query.FacultyId,
+			StudentId:             query.StudentId,
+			ContributionSessionId: query.ContributionSessionId,
+			Status:                Accepted,
+		})
+		if err != nil {
+			return nil, err
+		}
+		break
+	case common.MarketingCoordinator:
+		result, count, err = s.repository.FindAndCount(ctx, &IndexQuery{
+			PaginateQuery:         query.PaginateQuery,
+			FacultyId:             user.FacultyId,
+			StudentId:             query.StudentId,
+			ContributionSessionId: query.ContributionSessionId,
+			Status:                query.Status,
+		})
+		if err != nil {
+			return nil, err
+		}
+		break
+	case common.Student:
+		result, count, err = s.repository.FindAndCount(ctx, &IndexQuery{
+			PaginateQuery:         query.PaginateQuery,
+			FacultyId:             user.FacultyId,
+			StudentId:             &user.Id,
+			ContributionSessionId: query.ContributionSessionId,
+			Status:                query.Status,
+		})
+		if err != nil {
+			return nil, err
+		}
+	default:
+		return nil, apperror.New(apperror.ErrForbidden, "", nil)
 	}
-	// TODO
-	return nil, nil
+
+	return common.NewPaginateResponse(result, count, query.Page, query.GetLimit()), nil
 }
 
 func (s Service) FindById(ctx context.Context, id int) (*ContributionRes, error) {

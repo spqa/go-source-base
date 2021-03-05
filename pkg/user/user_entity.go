@@ -10,6 +10,7 @@ type Entity struct {
 	Name      string
 	Email     string
 	Password  string
+	FacultyId *int
 	Role      common.Role
 	CreatedAt time.Time
 	UpdatedAt time.Time

@@ -3,7 +3,6 @@ package user
 import (
 	"context"
 	"errors"
-	"github.com/casbin/casbin/v2"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -16,18 +15,15 @@ import (
 type Service struct {
 	cfg        *config.Config
 	repository *repository
-	enforcer   *casbin.Enforcer
 }
 
 func InitializeService(
 	cfg *config.Config,
 	repository *repository,
-	enforcer *casbin.Enforcer,
 ) *Service {
 	return &Service{
 		cfg:        cfg,
 		repository: repository,
-		enforcer:   enforcer,
 	}
 }
 
@@ -124,10 +120,11 @@ func mapEntitiesToResponse(entity []*Entity) []*UserResponse {
 
 func mapEntityToResponse(entity *Entity) *UserResponse {
 	return &UserResponse{
-		Id:    entity.Id,
-		Name:  entity.Name,
-		Role:  entity.Role,
-		Email: entity.Email,
+		Id:        entity.Id,
+		Name:      entity.Name,
+		Role:      entity.Role,
+		Email:     entity.Email,
+		FacultyId: entity.FacultyId,
 		TrackTime: common.TrackTime{
 			CreatedAt: entity.CreatedAt,
 			UpdatedAt: entity.UpdatedAt,

@@ -46,7 +46,10 @@ func (h *Handler) index(ctx echo.Context) error {
 	if err != nil {
 		return err
 	}
-	loggedInUser := common.GetLoggedInUser(ctx)
+	loggedInUser, err := common.GetLoggedInUser(ctx.Request().Context())
+	if err != nil {
+		return err
+	}
 	paginateRes, err := h.service.Find(ctx.Request().Context(), loggedInUser, query)
 	if err != nil {
 		return apperror.HandleError(err, ctx)
@@ -87,9 +90,12 @@ func (h *Handler) getById(ctx echo.Context) error {
 // @Security ApiKeyAuth
 // @Router /users [post]
 func (h Handler) createUser(ctx echo.Context) error {
-	loggedInUser := common.GetLoggedInUser(ctx)
+	loggedInUser, err := common.GetLoggedInUser(ctx.Request().Context())
+	if err != nil {
+		return apperror.HandleError(err, ctx)
+	}
 	req := &UserCreateReq{}
-	err := ctx.Bind(req)
+	err = ctx.Bind(req)
 	if err != nil {
 		return err
 	}

@@ -28,11 +28,16 @@ func requireAuthentication() echo.MiddlewareFunc {
 			u := c.Get("user").(*jwt.Token)
 			claims := u.Claims.(jwt.MapClaims)
 			id, _ := strconv.Atoi(claims["sub"].(string))
-			c.Set("user", &common.LoggedInUser{
-				Id:    id,
-				Email: claims["email"].(string),
-				Name:  claims["name"].(string),
-				Role:  common.Role(claims["role"].(string)),
+			var facultyId int
+			if claims["facultyId"] != nil {
+				facultyId, _ = strconv.Atoi(claims["facultyId"].(string))
+			}
+			common.SetLoggedInUser(c, &common.LoggedInUser{
+				Id:        id,
+				Email:     claims["email"].(string),
+				Name:      claims["name"].(string),
+				Role:      common.Role(claims["role"].(string)),
+				FacultyId: &facultyId,
 			})
 			return next(c)
 		}

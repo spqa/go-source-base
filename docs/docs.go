@@ -6,8 +6,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"strings"
+	"text/template"
 
-	"github.com/alecthomas/template"
 	"github.com/swaggo/swag"
 )
 
@@ -525,12 +525,37 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "integer",
+                        "name": "contributionSessionId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "facultyId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
                         "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "accepted",
+                            "rejected",
+                            "reviewing"
+                        ],
+                        "type": "string",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "studentId",
                         "in": "query"
                     }
                 ],
@@ -1307,6 +1332,9 @@ var doc = `{
                 "email": {
                     "type": "string"
                 },
+                "facultyId": {
+                    "type": "integer"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -1591,6 +1619,9 @@ var doc = `{
                 },
                 "email": {
                     "type": "string"
+                },
+                "facultyId": {
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"

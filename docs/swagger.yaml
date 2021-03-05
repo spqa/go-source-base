@@ -42,6 +42,8 @@ definitions:
         type: string
       email:
         type: string
+      facultyId:
+        type: integer
       id:
         type: integer
       name:
@@ -226,6 +228,8 @@ definitions:
         type: string
       email:
         type: string
+      facultyId:
+        type: integer
       id:
         type: integer
       name:
@@ -540,10 +544,26 @@ paths:
       description: List contributions
       parameters:
       - in: query
+        name: contributionSessionId
+        type: integer
+      - in: query
+        name: facultyId
+        type: integer
+      - in: query
         name: limit
         type: integer
       - in: query
         name: page
+        type: integer
+      - enum:
+        - accepted
+        - rejected
+        - reviewing
+        in: query
+        name: status
+        type: string
+      - in: query
+        name: studentId
         type: integer
       produces:
       - application/json

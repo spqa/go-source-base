@@ -8,6 +8,10 @@ import (
 
 type IndexQuery struct {
 	common.PaginateQuery
+	FacultyId             *int   `json:"facultyId"`
+	StudentId             *int   `json:"studentId"`
+	ContributionSessionId *int   `json:"contributionSessionId"`
+	Status                Status `json:"status" enums:"accepted,rejected,reviewing"`
 }
 
 type ContributionRes struct {
